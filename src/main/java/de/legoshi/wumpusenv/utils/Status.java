@@ -1,4 +1,4 @@
-package de.legoshi.wumpusenv;
+package de.legoshi.wumpusenv.utils;
 
 public enum Status {
 

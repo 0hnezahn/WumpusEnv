@@ -1,4 +1,6 @@
-package de.legoshi.wumpusenv;
+package de.legoshi.wumpusenv.game;
+
+import de.legoshi.wumpusenv.utils.Status;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,7 @@
-package de.legoshi.wumpusenv;
+package de.legoshi.wumpusenv.utils;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +9,12 @@ import java.io.FileNotFoundException;
 
 public class Colorizer {
 
+    /**
+     * Helper class to map states to certain picture.
+     * @param status current field status
+     * @return picture that is associated with the cell state
+     * @throws FileNotFoundException
+     */
     public static ImageView colorize(Status status) throws FileNotFoundException {
 
         switch (status) {

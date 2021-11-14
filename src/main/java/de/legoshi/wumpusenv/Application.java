@@ -1,5 +1,6 @@
 package de.legoshi.wumpusenv;
 
+import de.legoshi.wumpusenv.game.GameState;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -7,6 +8,13 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Application extends javafx.application.Application {
+
+    /**
+     * Standard method to start application.
+     * @param stage
+     * @throws IOException
+     */
+
     @Override
     public void start(Stage stage) throws IOException {
 

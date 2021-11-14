@@ -1,16 +1,14 @@
 package de.legoshi.wumpusenv;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import de.legoshi.wumpusenv.game.GameState;
+import de.legoshi.wumpusenv.game.Player;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 import java.net.URL;
-import java.util.BitSet;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -26,6 +24,11 @@ public class Controller implements Initializable {
 
     private GameState gameState;
 
+    /**
+     * Initializes the listeners for sliders aswell as buttons
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -41,24 +44,55 @@ public class Controller implements Initializable {
             if(Math.floor(columnSlider.getValue()) == columnSlider.getValue()) initButtons();
         });
 
+        // add that if application is closed, all running bots are shut down aswell
+        // add extra display with some logging/data tracking (collects all "Sys.out")
+        // add a restart button (resets all bots, the field)
+
     }
 
     public void onSimulate(ActionEvent actionEvent) {
+
+        /* if(playerIds.size() <= 1) {
+            System.out.println("Not enough players added");
+            return;
+        } */
 
         // System.out.println(Color.BLACK.toString());
         gameState.generateRandomState();
         gameState.colorField(gridPane);
 
+        // start all bots
+        // application waits until it recieves "READY" from all bots
+        // timeout after 5 seconds
+
+
+
     }
 
     public void onAddBot(ActionEvent actionEvent) {
 
-        // 
+        ArrayList<Player> players = gameState.getPlayerIDs();
+
+        if(gameState.isRunning()) {
+            System.out.println("Game is currently running, press restart to pause");
+            return;
+        }
+
+        Player player = new Player(players.size());
+        players.add(player);
 
     }
 
     public void onRemoveBot(ActionEvent actionEvent) {
 
+        if(gameState.getPlayerIDs().isEmpty()) {
+            System.out.println("Game is currently running, press restart to pause");
+        }
+
+        if(gameState.isRunning()) {
+            System.out.println("Game is currently running, press restart to cancel and remove bots");
+            return;
+        }
 
     }
 

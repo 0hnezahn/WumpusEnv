@@ -1,26 +1,33 @@
-package de.legoshi.wumpusenv;
+package de.legoshi.wumpusenv.game;
 
+import de.legoshi.wumpusenv.utils.Colorizer;
+import de.legoshi.wumpusenv.utils.Status;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
 public class GameState {
 
     private FieldStatus[][] game;
-    private ArrayList<Integer> playerIDs;
+    private ArrayList<Player> players;
+    private boolean isRunning;
 
     public GameState() {
 
         this.game = new FieldStatus[3][3];
+        this.isRunning = false;
         this.playerIDs = new ArrayList<>();
-        playerIDs.add(1);
     }
 
+    /**
+     * Updates the current size of the game
+     * @param height height of the games cells
+     * @param width width of the games cells
+     */
     public void updateGameSize(int height, int width) {
 
         this.game = new FieldStatus[height][width]; //[y][x]
@@ -47,7 +54,8 @@ public class GameState {
             arrayListAvailable.remove((Object) randVal);
         }
 
-        // problem with different sizes :(
+        // Values of arrayListChosen?
+
         addGold((int)Math.floor(arrayListChosen.get(0)/getWidth()), arrayListChosen.get(0)%getWidth());
         addHole((int)Math.floor(arrayListChosen.get(1)/getWidth()), arrayListChosen.get(1)%getWidth());
         addPlayer((int)Math.floor(arrayListChosen.get(2)/getWidth()), arrayListChosen.get(2)%getWidth());
@@ -60,10 +68,16 @@ public class GameState {
 
     }
 
+    /**
+     * Iterates through all buttons existing and adds a picture onto them
+     * @param gridPane Pane that holds all the buttons
+     */
     public void colorField(GridPane gridPane) {
 
         ObservableList<Node> buttonList = gridPane.getChildren();
 
+        // column - spalte - x
+        // row - zeile - y
         for(int column = 0; column < getWidth(); column++) {
             for(int row = 0; row < getHeight(); row++) {
                 if(game[row][column].getArrayList().size() > 0) {
@@ -86,6 +100,11 @@ public class GameState {
 
     }
 
+    /**
+     * Helper function to add a player to a field
+     * @param posY position of players y coordinate
+     * @param posX position of players x coordinate
+     */
     private void addPlayer(int posY, int posX) {
 
         FieldStatus fieldStatus = new FieldStatus();
@@ -95,6 +114,11 @@ public class GameState {
 
     }
 
+    /**
+     * Helper function to add a gold to a field
+     * @param posY position of golds y coordinate
+     * @param posX position of golds x coordinate
+     */
     private void addGold(int posY, int posX) {
 
         FieldStatus fieldStatus = new FieldStatus();
@@ -107,6 +131,11 @@ public class GameState {
 
     }
 
+    /**
+     * Helper function to add a hole to a field
+     * @param posY position of hole y coordinate
+     * @param posX position of hole x coordinate
+     */
     private void addHole(int posY, int posX) {
 
         FieldStatus fieldStatus = new FieldStatus();
@@ -117,10 +146,20 @@ public class GameState {
 
     }
 
+    /**
+     * Helper function to initialize the remaining field
+     * @param posY y coordinate of empty field position
+     * @param posX x coordinate of empty field position
+     */
     private void initRemaining(int posY, int posX) {
         if(game[posY][posX] == null) game[posY][posX] = new FieldStatus();
     }
 
+    /**
+     * Helper function to add surrounding fieldstates
+     * @param posY position of field y coordinate
+     * @param posX position of field x coordinate
+     */
     private void addSurrounding(int posY, int posX, Status status) {
 
         if(posX-1 >= 0) {
@@ -148,6 +187,8 @@ public class GameState {
         }
     }
 
+    // is height and width correct?
+    // I think i chose first line and want length of it, so it should be width (?)
     public int getHeight() {
 
         return this.game[0].length;
@@ -158,4 +199,15 @@ public class GameState {
         return this.game.length;
     }
 
+    public ArrayList<Player> getPlayerIDs() {
+        return this.players;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
+    }
 }
