@@ -3,18 +3,46 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="602.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.legoshi.wumpusenv.Controller">
-   <children>
-      <Slider fx:id="rowSlider" blockIncrement="1.0" layoutX="430.0" layoutY="365.0" majorTickUnit="2.0" max="11.0" min="3.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0" />
-      <Slider fx:id="columnSlider" blockIncrement="1.0" layoutX="430.0" layoutY="396.0" majorTickUnit="2.0" max="11.0" min="3.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0" />
-      <Label layoutX="379.0" layoutY="363.0" text="Rows" />
-      <Label layoutX="379.0" layoutY="394.0" text="Lines" />
-      <Button fx:id="simulateButton" layoutX="254.0" layoutY="415.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="25.0" prefWidth="92.0" text="Simulate" />
-      <TextField layoutX="29.0" layoutY="360.0" promptText="add bot" />
-      <GridPane fx:id="gridPane" layoutX="149.0" layoutY="30.0" prefHeight="307.0" prefWidth="305.0">
+<BorderPane fx:id="borderPane" pickOnBounds="false" prefHeight="1000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.legoshi.wumpusenv.Controller">
+   <bottom>
+      <Pane fx:id="pane" prefHeight="202.0" prefWidth="602.0">
+         <children>
+            <Pane layoutX="-59.0" layoutY="101.0" prefHeight="84.0" prefWidth="247.0">
+               <children>
+                  <Slider fx:id="rowSlider" blockIncrement="1.0" layoutX="124.0" layoutY="4.0" majorTickUnit="2.0" max="11.0" min="3.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="7.0" />
+                  <Slider fx:id="columnSlider" blockIncrement="1.0" layoutX="124.0" layoutY="41.0" majorTickUnit="2.0" max="11.0" min="3.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="7.0" />
+                  <Label layoutX="69.0" layoutY="6.0" text="Rows" />
+                  <Label layoutX="70.0" layoutY="43.0" text="Lines" />
+               </children>
+            </Pane>
+            <Pane layoutX="388.0" layoutY="1.0" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Button layoutX="110.0" layoutY="14.0" mnemonicParsing="false" onAction="#onRandomize" text="Randomize" />
+               </children>
+            </Pane>
+            <Pane layoutY="1.0" prefHeight="103.0" prefWidth="230.0">
+               <children>
+                  <TextField layoutX="66.0" layoutY="24.0" promptText="add bot" />
+                  <Button fx:id="addBot" layoutX="14.0" layoutY="24.0" mnemonicParsing="false" onAction="#onAddBot" prefHeight="25.0" prefWidth="27.0" text="+" />
+                  <Button fx:id="removeBot" layoutX="14.0" layoutY="59.0" mnemonicParsing="false" onAction="#onRemoveBot" prefHeight="25.0" prefWidth="27.0" text="-" />
+                  <ChoiceBox fx:id="removeBotCB" layoutX="65.0" layoutY="59.0" prefWidth="150.0" />
+               </children>
+            </Pane>
+            <Pane layoutX="228.0" layoutY="110.0" prefHeight="85.0" prefWidth="122.0">
+               <children>
+                  <Button fx:id="simulateButton" layoutX="7.0" layoutY="34.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="43.0" prefWidth="108.0" text="Simulate" />
+                  <Button layoutX="7.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="27.0" text="&lt;" />
+                  <Label alignment="CENTER" layoutX="47.0" layoutY="6.0" prefHeight="17.0" prefWidth="28.0" text="0" textAlignment="RIGHT" />
+                  <Button layoutX="86.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" text="&gt;" />
+               </children>
+            </Pane>
+         </children>
+      </Pane>
+   </bottom>
+   <center>
+      <GridPane fx:id="gridPane" alignment="CENTER" pickOnBounds="false" prefHeight="303.0" prefWidth="303.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" />
-            <Button layoutX="102.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <Button layoutX="204.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Button layoutY="102.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Button layoutX="102.0" layoutY="102.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.rowIndex="1" />
@@ -22,6 +50,7 @@
             <Button layoutY="204.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button layoutX="102.0" layoutY="204.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="2" />
             <Button layoutX="204.0" layoutY="204.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="1" />
+            <Button mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
          </children>
          <columnConstraints>
             <ColumnConstraints />
@@ -32,13 +61,7 @@
             <RowConstraints />
             <RowConstraints />
             <RowConstraints />
-         </rowConstraints></GridPane>
-      <Button fx:id="addBot" layoutX="187.0" layoutY="359.0" mnemonicParsing="false" onAction="#onAddBot" prefHeight="25.0" prefWidth="27.0" text="+" />
-      <ChoiceBox fx:id="removeBotCB" layoutX="29.0" layoutY="398.0" prefWidth="150.0" />
-      <Button fx:id="removeBot" layoutX="188.0" layoutY="398.0" mnemonicParsing="false" onAction="#onRemoveBot" prefHeight="25.0" prefWidth="27.0" text="-" />
-      <CheckBox fx:id="tilesVis" layoutX="491.0" layoutY="328.0" mnemonicParsing="false" text="tiles visible" />
-      <Button layoutX="254.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="27.0" text="&lt;" />
-      <Button layoutX="318.0" layoutY="386.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" text="&gt;" />
-      <Label layoutX="286.0" layoutY="390.0" prefHeight="17.0" prefWidth="28.0" text="0" textAlignment="RIGHT" />
-   </children>
-</AnchorPane>
+         </rowConstraints>
+      </GridPane>
+   </center>
+</BorderPane>

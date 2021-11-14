@@ -20,7 +20,7 @@ public class Application extends javafx.application.Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("view.fxml"));
 
-        Scene scene = new Scene(fxmlLoader.load(), 602.0, 466.0);
+        Scene scene = new Scene(fxmlLoader.load(), 1000.0, 1000.0);
         stage.setTitle("Wumpus Simulator!");
         stage.setScene(scene);
         stage.show();

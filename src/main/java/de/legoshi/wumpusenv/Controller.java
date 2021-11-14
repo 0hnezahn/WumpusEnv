@@ -2,13 +2,17 @@ package de.legoshi.wumpusenv;
 
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -20,9 +24,14 @@ public class Controller implements Initializable {
     public ChoiceBox removeBotCB;
     public Button removeBot;
     public CheckBox tilesVis;
+
     public GridPane gridPane;
+    public BorderPane borderPane;
+    public Pane pane;
+    public HBox hBox;
 
     private GameState gameState;
+    public Button[][] buttons;
 
     /**
      * Initializes the listeners for sliders aswell as buttons
@@ -32,9 +41,21 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        gridPane.setPrefSize(300, 300);
-
         initButtons();
+
+        StackPane paneL = new StackPane();
+        StackPane paneR = new StackPane();
+        StackPane paneU = new StackPane();
+
+        paneL.setPrefWidth(150);
+        paneR.setPrefWidth(150);
+        paneU.setPrefHeight(15);
+        borderPane.setLeft(paneL);
+        borderPane.setRight(paneR);
+        borderPane.setTop(paneU);
+
+        //gridPane.prefHeightProperty().bind(Bindings.divide(3, borderPane.heightProperty()));
+        //gridPane.prefWidthProperty().bind(Bindings.divide(3, borderPane.widthProperty()));
 
         rowSlider.valueProperty().addListener((observableValue, number, t1) -> { // check if double is integer
             if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
@@ -58,14 +79,11 @@ public class Controller implements Initializable {
         } */
 
         // System.out.println(Color.BLACK.toString());
-        gameState.generateRandomState();
-        gameState.colorField(gridPane);
+
 
         // start all bots
         // application waits until it recieves "READY" from all bots
         // timeout after 5 seconds
-
-
 
     }
 
@@ -80,24 +98,23 @@ public class Controller implements Initializable {
 
         Player player = new Player(players.size());
         players.add(player);
+        System.out.println("Successfully added player!");
 
     }
 
     public void onRemoveBot(ActionEvent actionEvent) {
-
-        if(gameState.getPlayerIDs().isEmpty()) {
-            System.out.println("Game is currently running, press restart to pause");
-        }
 
         if(gameState.isRunning()) {
             System.out.println("Game is currently running, press restart to cancel and remove bots");
             return;
         }
 
-    }
+        if(gameState.getPlayerIDs().isEmpty()) {
+            System.out.println("There are no players in the game!");
+            return;
+        }
 
-    public void onSliderEvent(DragEvent event) {
-
+        System.out.println("Successfully removed player!");
 
     }
 
@@ -105,12 +122,16 @@ public class Controller implements Initializable {
         double sliderValRow = rowSlider.getValue();
         double sliderValCol = columnSlider.getValue();
         gridPane.getChildren().clear();
+        this.buttons = new Button[(int)sliderValRow][(int)sliderValCol];
+
         for(int row = 0; row < sliderValRow; row++) {
             for(int column = 0; column < sliderValCol; column++) {
                 Button b = new Button();
-                b.setPrefHeight(101);
-                b.setPrefWidth(101);
+                b.setStyle("-fx-background-color: WHITE");
+                b.prefWidthProperty().bind(gridPane.widthProperty());
+                b.prefHeightProperty().bind(gridPane.heightProperty());
                 gridPane.add(b, column, row);
+                buttons[row][column] = b;
             }
         }
         if(gameState != null) this.gameState.updateGameSize((int) sliderValRow, (int) sliderValCol);
@@ -120,4 +141,20 @@ public class Controller implements Initializable {
         this.gameState = gameState;
     }
 
+    public void onRandomize(ActionEvent event) {
+
+        if(gameState.isRunning()) {
+            System.out.println("Game is currently still running!");
+            return;
+        }
+
+        for(int row = 0; row < rowSlider.getValue(); row++) {
+            for(int column = 0; column < columnSlider.getValue(); column++) {
+                buttons[row][column].setGraphic(null);
+            }
+        }
+
+        gameState.generateRandomState();
+        gameState.colorField(gridPane, buttons);
+    }
 }

@@ -3,11 +3,15 @@ package de.legoshi.wumpusenv.game;
 import de.legoshi.wumpusenv.utils.Colorizer;
 import de.legoshi.wumpusenv.utils.Status;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
 public class GameState {
@@ -18,9 +22,9 @@ public class GameState {
 
     public GameState() {
 
-        this.game = new FieldStatus[3][3];
+        this.game = new FieldStatus[7][7];
         this.isRunning = false;
-        this.playerIDs = new ArrayList<>();
+        this.players = new ArrayList<>();
     }
 
     /**
@@ -35,7 +39,7 @@ public class GameState {
 
     /**
      * Generates a random field with currently:
-     * 1 Hole
+     * |Agents| + 1 Holes
      * 1 Gold and Wumpus
      * n Players
      */
@@ -44,25 +48,35 @@ public class GameState {
         ArrayList<Integer> arrayListAvailable = new ArrayList<>();
         ArrayList<Integer> arrayListChosen = new ArrayList<>();
 
+        initState();
+
+        if((2 + players.size()*2) > getHeight()*getWidth()) {
+            System.out.println("Nicht genügend Felder zur Verfügung!");
+            return;
+        }
+
         for(int i = 0; i < getHeight()*getWidth(); i++) {
             arrayListAvailable.add(i);
         }
 
-        for(int i = 0; i < 2 + playerIDs.size(); i++) {
-            int randVal = (int) Math.floor(Math.random() * arrayListAvailable.size());
+        int playerCount = players.size();
+
+        for(int i = 0; i < 2 + playerCount*2; i++) {
+            int randVal;
+            do { randVal = (int) Math.floor(Math.random() * arrayListAvailable.size());
+            } while (arrayListChosen.contains(randVal));
             arrayListChosen.add(randVal);
-            arrayListAvailable.remove((Object) randVal);
         }
 
-        // Values of arrayListChosen?
-
-        addGold((int)Math.floor(arrayListChosen.get(0)/getWidth()), arrayListChosen.get(0)%getWidth());
-        addHole((int)Math.floor(arrayListChosen.get(1)/getWidth()), arrayListChosen.get(1)%getWidth());
-        addPlayer((int)Math.floor(arrayListChosen.get(2)/getWidth()), arrayListChosen.get(2)%getWidth());
+        addGold((int)Math.floor(arrayListChosen.get(0)/getWidth()),arrayListChosen.get(0)%getWidth());
+        for(int i = 0; i < playerCount+1; i++) addHole((int)Math.floor(arrayListChosen.get(1+i)/getWidth()),arrayListChosen.get(1+i)%getWidth());
+        for(int i = 0; i < playerCount; i++) addPlayer((int)Math.floor(arrayListChosen.get(2+i+playerCount)/getWidth()),arrayListChosen.get(2+i+playerCount) % getWidth());
 
         for(int column = 0; column < getWidth(); column++) {
             for(int row = 0; row < getHeight(); row++) {
-                initRemaining(row, column);
+                if(!game[row][column].getArrayList().isEmpty()) {
+                    System.out.println("x: " + column + "y: " + row + ": " + game[row][column].getArrayList().get(0).toString());
+                } else System.out.println("x: " + column + "y: " + row + ": NOTHING");
             }
         }
 
@@ -72,9 +86,7 @@ public class GameState {
      * Iterates through all buttons existing and adds a picture onto them
      * @param gridPane Pane that holds all the buttons
      */
-    public void colorField(GridPane gridPane) {
-
-        ObservableList<Node> buttonList = gridPane.getChildren();
+    public void colorField(GridPane gridPane, Button[][] buttons) {
 
         // column - spalte - x
         // row - zeile - y
@@ -82,13 +94,10 @@ public class GameState {
             for(int row = 0; row < getHeight(); row++) {
                 if(game[row][column].getArrayList().size() > 0) {
                     try {
-                        ImageView imageView = Colorizer.colorize(game[row][column].getArrayList().get(0));
-                        if(imageView != null) {
-                            Button button = ((Button) buttonList.get(column + row));
-                            imageView.setFitHeight(button.getHeight()/2);
-                            imageView.setFitWidth(button.getWidth()/2);
-                            button.setGraphic(imageView);
-                        }
+                        Button button = buttons[row][column];
+                        Node box = Colorizer.colorize(game[row][column].getArrayList(), button);
+                        // vBox.setAlignment(Pos.CENTER);
+                        button.setGraphic(box);
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.out.println("Something went wrong");
@@ -106,12 +115,7 @@ public class GameState {
      * @param posX position of players x coordinate
      */
     private void addPlayer(int posY, int posX) {
-
-        FieldStatus fieldStatus = new FieldStatus();
-        fieldStatus.getArrayList().add(Status.START);
-        fieldStatus.getArrayList().add(Status.OCCUPIED);
-        game[posY][posX] = fieldStatus;
-
+        game[posY][posX].addStatus(Status.START);
     }
 
     /**
@@ -120,15 +124,10 @@ public class GameState {
      * @param posX position of golds x coordinate
      */
     private void addGold(int posY, int posX) {
-
-        FieldStatus fieldStatus = new FieldStatus();
-        fieldStatus.getArrayList().add(Status.GOLD);
-        fieldStatus.getArrayList().add(Status.WUMPUS);
-        fieldStatus.getArrayList().add(Status.OCCUPIED);
-        game[posY][posX] = fieldStatus;
-
+        game[posY][posX].addStatus(Status.GOLD);
+        game[posY][posX].addStatus(Status.WUMPUS);
+        game[posY][posX].addStatus(Status.OCCUPIED);
         addSurrounding(posY, posX, Status.STENCH);
-
     }
 
     /**
@@ -137,22 +136,19 @@ public class GameState {
      * @param posX position of hole x coordinate
      */
     private void addHole(int posY, int posX) {
-
-        FieldStatus fieldStatus = new FieldStatus();
-        fieldStatus.getArrayList().add(Status.HOLE);
-        game[posY][posX] = fieldStatus;
-
+        game[posY][posX].addStatus(Status.HOLE);
         addSurrounding(posY, posX, Status.WIND);
-
     }
 
     /**
-     * Helper function to initialize the remaining field
-     * @param posY y coordinate of empty field position
-     * @param posX x coordinate of empty field position
+     * Helper function to initialize the field
      */
-    private void initRemaining(int posY, int posX) {
-        if(game[posY][posX] == null) game[posY][posX] = new FieldStatus();
+    public void initState() {
+        for(int column = 0; column < getWidth(); column++) {
+            for(int row = 0; row < getHeight(); row++) {
+                game[row][column] = new FieldStatus();
+            }
+        }
     }
 
     /**
@@ -161,41 +157,19 @@ public class GameState {
      * @param posX position of field x coordinate
      */
     private void addSurrounding(int posY, int posX, Status status) {
-
-        if(posX-1 >= 0) {
-            FieldStatus fieldStatus = new FieldStatus();
-            fieldStatus.getArrayList().add(status);
-            game[posY][posX-1] = fieldStatus;
-        }
-
-        if(posY-1 >= 0) {
-            FieldStatus fieldStatus = new FieldStatus();
-            fieldStatus.getArrayList().add(status);
-            game[posY-1][posX] = fieldStatus;
-        }
-
-        if(posX+1 < getHeight()) {
-            FieldStatus fieldStatus = new FieldStatus();
-            fieldStatus.getArrayList().add(status);
-            game[posY][posX+1] = fieldStatus;
-        }
-
-        if(posY+1 < getWidth()) {
-            FieldStatus fieldStatus = new FieldStatus();
-            fieldStatus.getArrayList().add(status);
-            game[posY+1][posX] = fieldStatus;
-        }
+        if(posX-1 >= 0) game[posY][posX-1].addStatus(status);
+        if(posY-1 >= 0) game[posY-1][posX].addStatus(status);
+        if(posX+1 < getWidth()) game[posY][posX+1].addStatus(status);
+        if(posY+1 < getHeight()) game[posY+1][posX].addStatus(status);
     }
 
     // is height and width correct?
     // I think i chose first line and want length of it, so it should be width (?)
-    public int getHeight() {
-
+    public int getWidth() {
         return this.game[0].length;
     }
 
-    public int getWidth() {
-
+    public int getHeight() {
         return this.game.length;
     }
 

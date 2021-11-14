@@ -9,7 +9,7 @@
         <module name="WumpusEnv" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="16">
       <module name="WumpusEnv" target="16" />
     </bytecodeTargetLevel>
   </component>
