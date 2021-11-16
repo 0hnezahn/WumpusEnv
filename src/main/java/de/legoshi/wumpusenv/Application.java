@@ -30,6 +30,12 @@ public class Application extends javafx.application.Application {
         controller.setGameState(gameState);
     }
 
+    @Override
+    public void stop() {
+
+
+    }
+
     public static void main(String[] args) {
         launch();
     }

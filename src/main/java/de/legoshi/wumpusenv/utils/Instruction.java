@@ -2,10 +2,13 @@ package de.legoshi.wumpusenv.utils;
 
 public enum Instruction {
 
+    INIT,
+    READY,
+
     UP,
+    DOWN,
     LEFT,
     RIGHT,
-    DOWN,
     NOTHING,
     SCREAM,
     PICKUP;

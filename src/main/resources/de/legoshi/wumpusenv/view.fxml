@@ -22,7 +22,7 @@
             </Pane>
             <Pane layoutY="1.0" prefHeight="103.0" prefWidth="230.0">
                <children>
-                  <TextField layoutX="66.0" layoutY="24.0" promptText="add bot" />
+                  <TextField fx:id="botName" layoutX="66.0" layoutY="24.0" promptText="add bot" />
                   <Button fx:id="addBot" layoutX="14.0" layoutY="24.0" mnemonicParsing="false" onAction="#onAddBot" prefHeight="25.0" prefWidth="27.0" text="+" />
                   <Button fx:id="removeBot" layoutX="14.0" layoutY="59.0" mnemonicParsing="false" onAction="#onRemoveBot" prefHeight="25.0" prefWidth="27.0" text="-" />
                   <ChoiceBox fx:id="removeBotCB" layoutX="65.0" layoutY="59.0" prefWidth="150.0" />
@@ -36,6 +36,7 @@
                   <Button layoutX="86.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" text="&gt;" />
                </children>
             </Pane>
+            <Button fx:id="abortButton" onAction="#onAbort" layoutX="899.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Abort" />
          </children>
       </Pane>
    </bottom>

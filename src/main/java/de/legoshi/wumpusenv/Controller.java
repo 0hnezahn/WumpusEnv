@@ -2,18 +2,18 @@ package de.legoshi.wumpusenv;
 
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
-import javafx.beans.binding.Bindings;
+import de.legoshi.wumpusenv.utils.ApplicationCommunicator;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
 import javafx.scene.layout.*;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Controller implements Initializable {
 
@@ -29,9 +29,15 @@ public class Controller implements Initializable {
     public BorderPane borderPane;
     public Pane pane;
     public HBox hBox;
+    public TextField botName;
+
+    public Button abortButton;
 
     private GameState gameState;
     public Button[][] buttons;
+
+    private ApplicationCommunicator applicationCommunicator;
+    private ScheduledExecutorService executorService;
 
     /**
      * Initializes the listeners for sliders aswell as buttons
@@ -42,6 +48,7 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         initButtons();
+        this.applicationCommunicator = new ApplicationCommunicator(gameState);
 
         StackPane paneL = new StackPane();
         StackPane paneR = new StackPane();
@@ -53,9 +60,6 @@ public class Controller implements Initializable {
         borderPane.setLeft(paneL);
         borderPane.setRight(paneR);
         borderPane.setTop(paneU);
-
-        //gridPane.prefHeightProperty().bind(Bindings.divide(3, borderPane.heightProperty()));
-        //gridPane.prefWidthProperty().bind(Bindings.divide(3, borderPane.widthProperty()));
 
         rowSlider.valueProperty().addListener((observableValue, number, t1) -> { // check if double is integer
             if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
@@ -71,51 +75,79 @@ public class Controller implements Initializable {
 
     }
 
-    public void onSimulate(ActionEvent actionEvent) {
+    public void onSimulate() {
+        if(gameState.isRunning()) {
+            System.out.println("Game is currently running");
+            return;
+        }
 
-        /* if(playerIds.size() <= 1) {
+        if(gameState.getPlayers().size() <= 1) {
             System.out.println("Not enough players added");
             return;
-        } */
+        }
 
-        // System.out.println(Color.BLACK.toString());
-
-
+        this.executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(applicationCommunicator,100, 100, TimeUnit.MILLISECONDS);
         // start all bots
         // application waits until it recieves "READY" from all bots
         // timeout after 5 seconds
-
     }
 
-    public void onAddBot(ActionEvent actionEvent) {
+    public void onAbort() {
+        for(Player p : gameState.getPlayers()) {
+            p.getFile().delete();
+            p.getProcess().destroy();
+        }
 
-        ArrayList<Player> players = gameState.getPlayerIDs();
+        gameState.getPlayers().clear();
+        executorService.shutdown();
+    }
 
+    public void onAddBot() {
+        ArrayList<Player> players = gameState.getPlayers();
         if(gameState.isRunning()) {
             System.out.println("Game is currently running, press restart to pause");
             return;
         }
 
         Player player = new Player(players.size());
+
+        // for now only .jars
+        String bName = botName.getText();
+        applicationCommunicator.generateNewPlayer(player, bName);
+
+        // end process after app closed
+
         players.add(player);
         System.out.println("Successfully added player!");
-
     }
 
-    public void onRemoveBot(ActionEvent actionEvent) {
+    public void onRandomize(ActionEvent event) {
+        if(gameState.isRunning()) {
+            System.out.println("Game is currently still running!");
+            return;
+        }
 
+        for(int row = 0; row < rowSlider.getValue(); row++) {
+            for(int column = 0; column < columnSlider.getValue(); column++) {
+                buttons[row][column].setGraphic(null);
+            }
+        }
+        gameState.generateRandomState();
+        gameState.colorField(gridPane, buttons);
+    }
+
+    public void onRemoveBot() {
         if(gameState.isRunning()) {
             System.out.println("Game is currently running, press restart to cancel and remove bots");
             return;
         }
 
-        if(gameState.getPlayerIDs().isEmpty()) {
+        if(gameState.getPlayers().isEmpty()) {
             System.out.println("There are no players in the game!");
             return;
         }
-
         System.out.println("Successfully removed player!");
-
     }
 
     private void initButtons() {
@@ -141,20 +173,4 @@ public class Controller implements Initializable {
         this.gameState = gameState;
     }
 
-    public void onRandomize(ActionEvent event) {
-
-        if(gameState.isRunning()) {
-            System.out.println("Game is currently still running!");
-            return;
-        }
-
-        for(int row = 0; row < rowSlider.getValue(); row++) {
-            for(int column = 0; column < columnSlider.getValue(); column++) {
-                buttons[row][column].setGraphic(null);
-            }
-        }
-
-        gameState.generateRandomState();
-        gameState.colorField(gridPane, buttons);
-    }
 }

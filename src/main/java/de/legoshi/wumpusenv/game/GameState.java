@@ -2,18 +2,16 @@ package de.legoshi.wumpusenv.game;
 
 import de.legoshi.wumpusenv.utils.Colorizer;
 import de.legoshi.wumpusenv.utils.Status;
-import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 
+@Getter
+@Setter
 public class GameState {
 
     private FieldStatus[][] game;
@@ -163,25 +161,20 @@ public class GameState {
         if(posY+1 < getHeight()) game[posY+1][posX].addStatus(status);
     }
 
-    // is height and width correct?
-    // I think i chose first line and want length of it, so it should be width (?)
+    /**
+     * Getter for width of game field
+     * @return width of game field
+     */
     public int getWidth() {
         return this.game[0].length;
     }
 
+    /**
+     * Getter for height of game field
+     * @return height of game field
+     */
     public int getHeight() {
         return this.game.length;
     }
 
-    public ArrayList<Player> getPlayerIDs() {
-        return this.players;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public void setRunning(boolean running) {
-        isRunning = running;
-    }
 }

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/JavaBot/JavaBot.iml" filepath="$PROJECT_DIR$/JavaBot/JavaBot.iml" />
       <module fileurl="file://$PROJECT_DIR$/WumpusEnv.iml" filepath="$PROJECT_DIR$/WumpusEnv.iml" />
     </modules>
   </component>
