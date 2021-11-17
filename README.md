@@ -7,7 +7,7 @@ Message format for Instructions: \
 "B;UP;false,false,false". Notice that you can only have one interaction at once. If you put in more then the first filled in in shown order is taken.
 
 Message format for Status of field/player: \
-"C;[TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b)" \
+"C;[SELF][TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b);ALIVE(b)" \
 The vector of scream is initialized with [0,0]
 
 # Java Bot
