@@ -20,7 +20,7 @@ public class Main {
 
         while(true) {
 
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(500);
 
             String initMessage = fileHelper.readFile();
             String[] message = initMessage.split(";");

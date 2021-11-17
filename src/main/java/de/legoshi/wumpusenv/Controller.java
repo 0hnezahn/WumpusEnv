@@ -5,18 +5,17 @@ import de.legoshi.wumpusenv.game.Player;
 import de.legoshi.wumpusenv.utils.Communicator;
 import de.legoshi.wumpusenv.utils.Simulator;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import javafx.beans.value.ObservableStringValue;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Controller implements Initializable {
 
@@ -31,16 +30,21 @@ public class Controller implements Initializable {
     public GridPane gridPane;
     public BorderPane borderPane;
     public Pane pane;
-    public HBox hBox;
     public TextField botName;
 
     public Button abortButton;
+    public Label stepLabel;
 
     private GameState gameState;
     public Button[][] buttons;
 
     private Communicator communicator;
     private Simulator simulator;
+
+    private boolean paused;
+    private boolean generated;
+
+    private AtomicInteger step;
 
     /**
      * Initializes the listeners for sliders aswell as buttons
@@ -54,6 +58,8 @@ public class Controller implements Initializable {
         // add a restart button (resets all bots, the field)
 
         initButtons();
+        paused = false;
+        generated = false;
 
         rowSlider.valueProperty().addListener((observableValue, number, t1) -> {
             if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
@@ -75,6 +81,11 @@ public class Controller implements Initializable {
             return;
         }
 
+        if(!generated) {
+            System.out.println("Nothing generated yet!");
+            return;
+        }
+
         if(gameState.getPlayers().size() <= 0) {
             System.out.println("Not enough players added");
             return;
@@ -83,9 +94,7 @@ public class Controller implements Initializable {
         gameState.setRunning(true);
 
         boolean temp = true;
-
         while(temp) {
-            // application waits until it recieves "READY" from all bots
             if (communicator.isReady()) {
                 for (Player all : gameState.getPlayers()) {
                     all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition())); // init state
@@ -94,20 +103,22 @@ public class Controller implements Initializable {
             }
         }
 
+        this.step = new AtomicInteger(1);
         simulator.sendPlayerStates();
-
         ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-            if(communicator.isReady()) {
-                simulator.receiveInstructions();
-                simulator.simulateStep();
-                for (Player all : gameState.getPlayers()) {
-                    all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+            if(!paused) {
+                if (communicator.isReady()) {
+                    simulator.receiveInstructions();
+                    simulator.simulateStep();
+                    for (Player all : gameState.getPlayers()) {
+                        all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+                    }
+                    simulator.sendPlayerStates();
+                    Platform.runLater(this::reloadBoard);
                 }
-                simulator.sendPlayerStates();
-                Platform.runLater(this::reloadBoard);
             }
-        }, 100, 1000, TimeUnit.MILLISECONDS);
+        }, 100, 100, TimeUnit.MILLISECONDS);
 
     }
 
@@ -116,10 +127,16 @@ public class Controller implements Initializable {
      */
     public void onAbort() {
         for(Player p : gameState.getPlayers()) {
-            if(p.getFile().delete()) System.out.println("Successfully deleted files");
             p.getProcess().destroy();
         }
+        gameState.setRunning(false);
         gameState.getPlayers().clear();
+
+        for(int row = 0; row < rowSlider.getValue(); row++) {
+            for(int column = 0; column < columnSlider.getValue(); column++) {
+                buttons[row][column].setGraphic(null);
+            }
+        }
     }
 
     /**
@@ -148,6 +165,8 @@ public class Controller implements Initializable {
             System.out.println("Game is currently still running!");
             return;
         }
+
+        generated = true;
 
         for(int row = 0; row < rowSlider.getValue(); row++) {
             for(int column = 0; column < columnSlider.getValue(); column++) {
@@ -212,5 +231,13 @@ public class Controller implements Initializable {
 
     public void setSimulator(Simulator simulator) {
         this.simulator = simulator;
+    }
+
+    public void onPause() {
+        paused = true;
+    }
+
+    public void onContinue() {
+        paused = false;
     }
 }

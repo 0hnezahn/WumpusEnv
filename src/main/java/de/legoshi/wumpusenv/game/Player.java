@@ -36,12 +36,13 @@ public class Player extends Entity {
     }
 
     //B;MOVE;SCREAM(b);PICKUP(b);CLIMB(b)
-    //C;[TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b)
+    //C;[TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b);ALIVE(b)
     public String perceptionToString() {
 
         if(playerVision.getScream() == null) this.playerVision.setScream(new Point2D(0,0));
 
         String s = "C;";
+        s = s + listToString(playerVision.getSelf()) + ";";
         s = s + listToString(playerVision.getTop()) + ";";
         s = s + listToString(playerVision.getBottom()) + ";";
         s = s + listToString(playerVision.getRight()) + ";";
@@ -49,6 +50,7 @@ public class Player extends Entity {
         s = s + "[" + playerVision.getScream().getX() + "," + playerVision.getScream().getY() + "]" + ";";
         s = s + hasGold + ";";
         s = s + hasEscaped + ";";
+        s = s + alive;
         return s;
     }
 

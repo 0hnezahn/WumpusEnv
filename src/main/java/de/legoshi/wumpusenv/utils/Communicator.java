@@ -4,7 +4,6 @@ import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Communicator {

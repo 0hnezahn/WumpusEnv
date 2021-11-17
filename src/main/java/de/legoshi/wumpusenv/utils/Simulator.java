@@ -46,6 +46,7 @@ public class Simulator {
                     if(gameState.getGame()[(int)currentPos.getY()][(int)currentPos.getX()].equals(Status.GOLD)) {
                         all.setHasGold(true);
                         System.out.println(all.getId() + " has collected the gold!");
+                        gameState.getGame()[(int)currentPos.getY()][(int)currentPos.getX()].getArrayList().remove(Status.GOLD);
                     }
                 }
             }
@@ -96,8 +97,17 @@ public class Simulator {
 
         if (!player.isAlive()) {
             gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
-            // gameState.getPlayers().remove(player);
             System.out.println(player.getId() + " just died. F");
+            return;
+        }
+
+        if(gameState.getGame()[playerOldY][playerOldX].getArrayList().equals(Status.HOLE)) {
+            gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
+            player.setAlive(false);
+        }
+
+        if(player.isHasGold() && player.isHasEscaped()) {
+            gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
             return;
         }
 

@@ -17,7 +17,15 @@
             </Pane>
             <Pane layoutX="388.0" layoutY="1.0" prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <Button layoutX="110.0" layoutY="14.0" mnemonicParsing="false" onAction="#onRandomize" text="Randomize" />
+                  <Pane layoutX="46.0" layoutY="-1.0" prefHeight="190.0" prefWidth="122.0">
+                     <children>
+                        <Button fx:id="simulateButton" layoutY="8.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="43.0" prefWidth="116.0" text="Simulate" />
+                        <Label fx:id="stepLabel" alignment="CENTER" layoutX="26.0" layoutY="60.0" prefHeight="17.0" prefWidth="64.0" textAlignment="RIGHT" />
+                        <Button fx:id="abortButton" layoutX="18.0" layoutY="157.0" mnemonicParsing="false" onAction="#onAbort" prefHeight="25.0" prefWidth="80.0" text="Abort" />
+                        <Button fx:id="pauseButton" layoutX="18.0" layoutY="83.0" mnemonicParsing="false" onAction="#onPause" prefHeight="25.0" prefWidth="81.0" text="Pause" />
+                        <Button fx:id="continueButton" layoutX="18.0" layoutY="120.0" mnemonicParsing="false" onAction="#onContinue" prefHeight="25.0" prefWidth="80.0" text="Continue" />
+                     </children>
+                  </Pane>
                </children>
             </Pane>
             <Pane layoutY="1.0" prefHeight="103.0" prefWidth="230.0">
@@ -28,15 +36,7 @@
                   <ChoiceBox fx:id="removeBotCB" layoutX="65.0" layoutY="59.0" prefWidth="150.0" />
                </children>
             </Pane>
-            <Pane layoutX="228.0" layoutY="110.0" prefHeight="85.0" prefWidth="122.0">
-               <children>
-                  <Button fx:id="simulateButton" layoutX="7.0" layoutY="34.0" mnemonicParsing="false" onAction="#onSimulate" prefHeight="43.0" prefWidth="108.0" text="Simulate" />
-                  <Button layoutX="7.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="27.0" text="&lt;" />
-                  <Label alignment="CENTER" layoutX="47.0" layoutY="6.0" prefHeight="17.0" prefWidth="28.0" text="0" textAlignment="RIGHT" />
-                  <Button layoutX="86.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" text="&gt;" />
-               </children>
-            </Pane>
-            <Button fx:id="abortButton" layoutX="899.0" layoutY="14.0" mnemonicParsing="false" onAction="#onAbort" prefHeight="25.0" prefWidth="80.0" text="Abort" />
+            <Button layoutX="892.0" layoutY="160.0" mnemonicParsing="false" onAction="#onRandomize" text="Randomize" />
          </children>
       </Pane>
    </bottom>
