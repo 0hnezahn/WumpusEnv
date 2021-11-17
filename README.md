@@ -1,5 +1,6 @@
 # Wumpus Enviroment
-Code for the Wumpus Enviroment can be found in the src folder.
+Code for the Wumpus Enviroment can be found in the src folder. I suggest a communication pattern as follows:
+The Enviroment starts its message with "E;...". The bot starts its message with "B;...". Each argument or instruction is sperated with a ";".
 
 # Java Bot
 The Java Bot implementation is done. It can be found in the JavaBot folder.
