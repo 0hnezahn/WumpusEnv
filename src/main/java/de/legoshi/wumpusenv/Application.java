@@ -2,12 +2,15 @@ package de.legoshi.wumpusenv;
 
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
+import de.legoshi.wumpusenv.utils.Communicator;
+import de.legoshi.wumpusenv.utils.Simulator;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
+import java.util.SortedMap;
 
 public class Application extends javafx.application.Application {
 
@@ -28,8 +31,13 @@ public class Application extends javafx.application.Application {
         stage.show();
 
         Controller controller = fxmlLoader.getController();
+
         this.gameState = new GameState();
+        Communicator communicator = new Communicator(gameState);
+        Simulator simulator = new Simulator(gameState, communicator);
         controller.setGameState(gameState);
+        controller.setCommunicator(communicator);
+        controller.setSimulator(simulator);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }

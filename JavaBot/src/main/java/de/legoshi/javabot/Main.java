@@ -1,18 +1,17 @@
 package main.java.de.legoshi.javabot;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
-        File file = new File("./"+args[0]);
-        File logFile = new File("./log-"+args[0]);
+        //File file = new File("./"+args[0]);
+        //File logFile = new File("./log-"+args[0]);
 
-        // File file = new File("./javabot.jar.txt");
-        // File logFile = new File("./log-javabot.jar.txt");
+        File file = new File("./javabot.jar.txt");
+        File logFile = new File("./log-javabot.jar.txt");
 
         FileHelper fileHelper = new FileHelper(file, logFile);
 
@@ -21,10 +20,19 @@ public class Main {
 
         while(true) {
 
+            TimeUnit.SECONDS.sleep(1);
+
             String initMessage = fileHelper.readFile();
             String[] message = initMessage.split(";");
 
             if(message.length >= 1) {
+                if(message.length > 2) {
+                    if(message[0].equals("C") && message[1].equals("INIT")) {
+                        String readyMessage = "B;READY";
+                        fileHelper.writeToFile(readyMessage);
+                        message = readyMessage.split(";");
+                    }
+                }
                 if(message[0].equals("C")) {
                     step++;
                     fileHelper.log(step + ". STEP \r\n");
@@ -35,9 +43,7 @@ public class Main {
                     bot.gameState = initMessage;
 
                     bot.execute();
-                    fileHelper.writeToFile("[" + java.time.LocalDateTime.now() + "] " + bot.command);
-
-                    fileHelper.log("\r\n");
+                    fileHelper.writeToFile(bot.command);
                     fileHelper.log("[" + java.time.LocalDateTime.now() + "] BOT PERFORMED: " + "\r\n");
                     fileHelper.log("[" + java.time.LocalDateTime.now() + "] " + bot.command + "\r\n");
                     fileHelper.log("--------------------------------------- \r\n");

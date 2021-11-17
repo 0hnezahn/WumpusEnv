@@ -11,6 +11,13 @@ public class Wumpus extends Entity {
     private int id;
     private Point2D wumpusSpawn;
 
+    public Wumpus(Point2D wumpusSpawn) {
+        this.playerVision = new PlayerVision();
+        this.wumpusSpawn = wumpusSpawn;
+        this.currentPosition = wumpusSpawn;
+        this.oldPosition = wumpusSpawn;
+    }
+
     public int spawnDistance() {
         return Math.max(
                 (int)Math.abs(currentPosition.getX() - wumpusSpawn.getX()),

@@ -18,10 +18,10 @@ abstract class Entity {
     public void updatePosition() {
         oldPosition = currentPosition;
         switch (instruction) {
-            case UP -> currentPosition.add(0,1);
-            case DOWN -> currentPosition.subtract(0,1);
-            case LEFT -> currentPosition.subtract(1,0);
-            case RIGHT -> currentPosition.add(1,0);
+            case UP -> currentPosition = currentPosition.subtract(0,1);
+            case DOWN -> currentPosition = currentPosition.add(0,1);
+            case LEFT -> currentPosition = currentPosition.subtract(1,0);
+            case RIGHT -> currentPosition = currentPosition.add(1,0);
         }
     }
 

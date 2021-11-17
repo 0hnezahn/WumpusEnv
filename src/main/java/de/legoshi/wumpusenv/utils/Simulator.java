@@ -1,31 +1,51 @@
 package de.legoshi.wumpusenv.utils;
 
-import de.legoshi.wumpusenv.game.GameState;
-import de.legoshi.wumpusenv.game.Player;
-import de.legoshi.wumpusenv.game.PlayerVision;
-import de.legoshi.wumpusenv.game.Wumpus;
+import de.legoshi.wumpusenv.game.*;
 import javafx.geometry.Point2D;
 
 public class Simulator {
 
     private GameState gameState;
+    private Communicator communicator;
 
-    public Simulator(GameState gameState) {
+    public Simulator(GameState gameState, Communicator communicator) {
         this.gameState = gameState;
+        this.communicator = communicator;
     }
 
     public void simulateStep() {
 
         wumpusMove();
+        // check for the other states that the player has
 
         for (Player all : gameState.getPlayers()) {
-            all.updatePosition();
-            validatePlayerPos(all);
-            syncPlayer(all);
-            if (all.isScream()) {
-                for (Player receivers : gameState.getPlayers()) {
-                    if (!receivers.equals(all)) {
-                        receiveScream(receivers, all.getCurrentPosition());
+            if(all.isAlive()) {
+                if(all.getInstruction() != Instruction.NOTHING) {
+                    all.updatePosition();
+                    validatePlayerPos(all);
+                    syncPlayer(all);
+                }
+                else if (all.isScream()) {
+                    for (Player receivers : gameState.getPlayers()) {
+                        if (!receivers.equals(all)) {
+                            receiveScream(receivers, all.getCurrentPosition());
+                        }
+                    }
+                }
+                else if(all.isClimb()) {
+                    Point2D currentPos = all.getCurrentPosition();
+                    if(gameState.getGame()[(int)currentPos.getY()][(int)currentPos.getX()].equals(Status.START)) {
+                        if(all.isHasGold()) {
+                            all.setHasEscaped(true);
+                            System.out.println(all.getId() + " has escaped with gold and won!");
+                        }
+                    }
+                }
+                else if(all.isPickup()) {
+                    Point2D currentPos = all.getCurrentPosition();
+                    if(gameState.getGame()[(int)currentPos.getY()][(int)currentPos.getX()].equals(Status.GOLD)) {
+                        all.setHasGold(true);
+                        System.out.println(all.getId() + " has collected the gold!");
                     }
                 }
             }
@@ -33,6 +53,20 @@ public class Simulator {
 
         syncWumpus();
 
+    }
+
+    public void sendPlayerStates() {
+        for (Player all : gameState.getPlayers()) {
+            communicator.writeToFile(all, all.perceptionToString());
+            System.out.println(all.perceptionToString());
+        }
+    }
+
+    public void receiveInstructions() {
+        for (Player all : gameState.getPlayers()) {
+            String message = communicator.readFile(all);
+            all.setStringToPlayer(message);
+        }
     }
 
     public void validatePlayerPos(Player player) {
@@ -46,10 +80,10 @@ public class Simulator {
             player.setCurrentPosition(player.getOldPosition());
         }
 
-        if(player.getCurrentPosition().equals(wumpus.getCurrentPosition())) {
+        if (player.getCurrentPosition().equals(wumpus.getCurrentPosition())) {
             player.setAlive(false);
         }
-        if(player.getOldPosition().equals(wumpus.getCurrentPosition())) {
+        if (player.getOldPosition().equals(wumpus.getCurrentPosition()) && player.getCurrentPosition().equals(wumpus.getOldPosition())) {
             player.setAlive(false);
         }
     }
@@ -60,10 +94,10 @@ public class Simulator {
         int playerX = (int) player.getCurrentPosition().getX();
         int playerY = (int) player.getCurrentPosition().getY();
 
-        if(!player.isAlive()) {
+        if (!player.isAlive()) {
             gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
-            gameState.getPlayers().remove(player);
-            System.out.println(player.getId() + " jus died. F");
+            // gameState.getPlayers().remove(player);
+            System.out.println(player.getId() + " just died. F");
             return;
         }
 
@@ -88,54 +122,52 @@ public class Simulator {
         Point2D wumpusSpawn = wumpus.getWumpusSpawn();
         Point2D wumpusCurr = wumpus.getCurrentPosition();
 
-        if (playerVision.getLeft().getArrayList().contains(Status.PLAYER)) {
+        if (playerVision.getLeft() != null && playerVision.getLeft().getArrayList().contains(Status.PLAYER)) {
             wumpus.setInstruction(Instruction.LEFT);
             wumpus.updatePosition();
-            if(wumpus.spawnDistance() > 2) {
+            if (wumpus.spawnDistance() > 2) {
                 wumpus.setCurrentPosition(wumpus.getOldPosition());
             } else return;
         }
-        if (playerVision.getRight().getArrayList().contains(Status.PLAYER)) {
+        if (playerVision.getRight() != null && playerVision.getRight().getArrayList().contains(Status.PLAYER)) {
             wumpus.setInstruction(Instruction.RIGHT);
             wumpus.updatePosition();
-            if(wumpus.spawnDistance() > 2) {
+            if (wumpus.spawnDistance() > 2) {
                 wumpus.setCurrentPosition(wumpus.getOldPosition());
             } else return;
         }
-        if (playerVision.getTop().getArrayList().contains(Status.PLAYER)) {
+        if (playerVision.getTop() != null && playerVision.getTop().getArrayList().contains(Status.PLAYER)) {
             wumpus.setInstruction(Instruction.UP);
             wumpus.updatePosition();
-            if(wumpus.spawnDistance() > 2) {
+            if (wumpus.spawnDistance() > 2) {
                 wumpus.setCurrentPosition(wumpus.getOldPosition());
             } else return;
         }
-        if (playerVision.getBottom().getArrayList().contains(Status.PLAYER)) {
+        if (playerVision.getBottom() != null && playerVision.getBottom().getArrayList().contains(Status.PLAYER)) {
             wumpus.setInstruction(Instruction.DOWN);
             wumpus.updatePosition();
-            if(wumpus.spawnDistance() > 2) {
+            if (wumpus.spawnDistance() > 2) {
                 wumpus.setCurrentPosition(wumpus.getOldPosition());
             } else return;
         }
 
-        int diffY = (int)(wumpusSpawn.getY() - wumpusCurr.getY());
-        if(diffY > 0) {
+        int diffY = (int) (wumpusSpawn.getY() - wumpusCurr.getY());
+        if (diffY > 0) {
             wumpus.setInstruction(Instruction.DOWN);
             wumpus.updatePosition();
             return;
-        }
-        else if(diffY < 0) {
+        } else if (diffY < 0) {
             wumpus.setInstruction(Instruction.UP);
             wumpus.updatePosition();
             return;
         }
 
-        int diffX = (int)(wumpusSpawn.getX() - wumpusCurr.getX());
-        if(diffX > 0) {
+        int diffX = (int) (wumpusSpawn.getX() - wumpusCurr.getX());
+        if (diffX > 0) {
             wumpus.setInstruction(Instruction.RIGHT);
             wumpus.updatePosition();
             return;
-        }
-        else if(diffX < 0) {
+        } else if (diffX < 0) {
             wumpus.setInstruction(Instruction.LEFT);
             wumpus.updatePosition();
             return;
@@ -154,9 +186,10 @@ public class Simulator {
         gameState.getGame()[wY][wX].getArrayList().add(Status.WUMPUS);
         gameState.removeSurrounding(wOldY, wOldX, Status.STENCH);
         gameState.addSurrounding(wY, wX, Status.STENCH);
+        wumpus.setOldPosition(wumpus.getCurrentPosition());
     }
 
-    private PlayerVision getSurroundings(Point2D point2D) {
+    public PlayerVision getSurroundings(Point2D point2D) {
         PlayerVision vision = new PlayerVision();
 
         int maxX = gameState.getWidth();
@@ -167,14 +200,16 @@ public class Simulator {
         if (posX - 1 >= 0) vision.setLeft(gameState.getGame()[posY][posX - 1]);
         else vision.setLeft(null);
 
-        if (posY - 1 >= 0) vision.setBottom(gameState.getGame()[posY - 1][posX]);
+        if (posY + 1 < maxY) vision.setBottom(gameState.getGame()[posY + 1][posX]);
         else vision.setBottom(null);
 
         if (posX + 1 < maxX) vision.setRight(gameState.getGame()[posY][posX + 1]);
         else vision.setRight(null);
 
-        if (posY + 1 < maxY) vision.setTop(gameState.getGame()[posY + 1][posX]);
+        if (posY - 1 >= 0) vision.setTop(gameState.getGame()[posY - 1][posX]);
         else vision.setTop(null);
+
+        vision.setSelf(gameState.getGame()[posY][posX]);
 
         return vision;
     }

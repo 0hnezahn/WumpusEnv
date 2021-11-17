@@ -4,6 +4,7 @@ import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
 import de.legoshi.wumpusenv.utils.Communicator;
 import de.legoshi.wumpusenv.utils.Simulator;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Controller implements Initializable {
@@ -38,7 +40,6 @@ public class Controller implements Initializable {
     public Button[][] buttons;
 
     private Communicator communicator;
-    private ScheduledExecutorService executorService;
     private Simulator simulator;
 
     /**
@@ -49,16 +50,10 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        // add that if application is closed, all running bots are shut down aswell
         // add extra display with some logging/data tracking (collects all "Sys.out")
         // add a restart button (resets all bots, the field)
 
         initButtons();
-        communicator = new Communicator(gameState);
-        simulator = new Simulator(gameState);
-
-        executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(communicator,100, 100, TimeUnit.MILLISECONDS);
 
         rowSlider.valueProperty().addListener((observableValue, number, t1) -> {
             if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
@@ -74,18 +69,46 @@ public class Controller implements Initializable {
      * Method thats called when the simulate button is pressed
      */
     public void onSimulate() {
+
         if(gameState.isRunning()) {
             System.out.println("Game is currently running");
             return;
         }
 
-        if(gameState.getPlayers().size() <= 1) {
+        if(gameState.getPlayers().size() <= 0) {
             System.out.println("Not enough players added");
             return;
         }
 
-        // application waits until it recieves "READY" from all bots
-        // timeout after 5 seconds
+        gameState.setRunning(true);
+
+        boolean temp = true;
+
+        while(temp) {
+            // application waits until it recieves "READY" from all bots
+            if (communicator.isReady()) {
+                for (Player all : gameState.getPlayers()) {
+                    all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition())); // init state
+                }
+                temp = false;
+            }
+        }
+
+        simulator.sendPlayerStates();
+
+        ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            if(communicator.isReady()) {
+                simulator.receiveInstructions();
+                simulator.simulateStep();
+                for (Player all : gameState.getPlayers()) {
+                    all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+                }
+                simulator.sendPlayerStates();
+                Platform.runLater(this::reloadBoard);
+            }
+        }, 100, 1000, TimeUnit.MILLISECONDS);
+
     }
 
     /**
@@ -97,7 +120,6 @@ public class Controller implements Initializable {
             p.getProcess().destroy();
         }
         gameState.getPlayers().clear();
-        executorService.shutdown();
     }
 
     /**
@@ -184,4 +206,11 @@ public class Controller implements Initializable {
         this.gameState = gameState;
     }
 
+    public void setCommunicator(Communicator communicator) {
+        this.communicator = communicator;
+    }
+
+    public void setSimulator(Simulator simulator) {
+        this.simulator = simulator;
+    }
 }

@@ -47,7 +47,6 @@ public class FileHelper {
             String before = readLog();
             BufferedWriter writer = new BufferedWriter(new FileWriter(log));
             writer.write(before + message);
-            System.out.println("WRITTEN: " + before + message);
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();

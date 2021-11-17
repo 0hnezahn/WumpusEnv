@@ -60,7 +60,7 @@ public class GameState {
 
         int goldPos = arrayListChosen.get(0);
         addGold(goldPos/getWidth(),goldPos%getWidth());
-        this.wumpus = new Wumpus();
+        this.wumpus = new Wumpus(new Point2D(goldPos%getWidth(),goldPos/getWidth()));
 
         for(int i = 0; i < playerCount+1; i++) {
             int holePos = arrayListChosen.get(W_COUNT+i);
@@ -70,7 +70,8 @@ public class GameState {
         for(int i = 0; i < playerCount; i++) {
             int playerPos = arrayListChosen.get(W_COUNT+MIN_H_COUNT+i+playerCount);
             addPlayer(playerPos/getWidth(),playerPos%getWidth());
-            players.get(i).setCurrentPosition(new Point2D(playerPos%getWidth(),playerPos/getWidth()));
+            Player player = players.get(i);
+            player.setCurrentPosition(new Point2D(playerPos%getWidth(),playerPos/getWidth()));
         }
 
     }

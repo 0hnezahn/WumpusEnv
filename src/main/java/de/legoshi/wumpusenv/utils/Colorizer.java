@@ -57,7 +57,7 @@ public class Colorizer {
                         imageViews.add(new ImageView(image));
                     }
                     case START -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/start.png");
+                        FileInputStream input = new FileInputStream("./src/main/resources/start.jpg");
                         Image image = new Image(input);
                         imageViews.add(new ImageView(image));
                     }

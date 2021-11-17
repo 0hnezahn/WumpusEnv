@@ -12,7 +12,7 @@ public class Bot {
     }
 
     public void execute() {
-        command = "B;NOTHING";
+        command = "B;UP;false;false;false";
         fileHelper.log("test log");
     }
 

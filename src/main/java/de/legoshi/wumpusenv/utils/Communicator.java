@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Communicator implements Runnable {
+public class Communicator {
 
     private GameState gameState;
 
@@ -47,9 +47,9 @@ public class Communicator implements Runnable {
         return playerTextFile;
     }
 
-    private void writeToFile(Player player, String message) {
+    public void writeToFile(Player player, String message) {
         try {
-            FileWriter fileWriter = new FileWriter(player.getFile());
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(player.getFile()));
             fileWriter.write(message);
             fileWriter.close();
         } catch (Exception e) {
@@ -58,11 +58,12 @@ public class Communicator implements Runnable {
         }
     }
 
-    private String readFile(Player player) {
+    public String readFile(Player player) {
         try {
             Scanner myReader = new Scanner(player.getFile());
             String data = "";
             while (myReader.hasNext()) data = data + myReader.nextLine();
+            myReader.close();
             return data;
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,27 +74,12 @@ public class Communicator implements Runnable {
 
     public boolean isReady() {
         for(Player p : gameState.getPlayers()) {
-            if(!readFile(p).equals("READY")) {
+            String[] m = readFile(p).split(";");
+            if(!m[0].equals("B")) {
                 return false;
             }
         }
         return true;
-    }
-
-    @Override
-    public void run() {
-
-        // all players ready
-        if(isReady()) {
-            ArrayList<Player> players = gameState.getPlayers();
-            for(Player player : players) {
-
-
-
-            }
-
-        }
-
     }
 
 }
