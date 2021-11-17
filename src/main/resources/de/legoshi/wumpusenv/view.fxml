@@ -36,7 +36,7 @@
                   <Button layoutX="86.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" text="&gt;" />
                </children>
             </Pane>
-            <Button fx:id="abortButton" onAction="#onAbort" layoutX="899.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Abort" />
+            <Button fx:id="abortButton" layoutX="899.0" layoutY="14.0" mnemonicParsing="false" onAction="#onAbort" prefHeight="25.0" prefWidth="80.0" text="Abort" />
          </children>
       </Pane>
    </bottom>
@@ -65,4 +65,13 @@
          </rowConstraints>
       </GridPane>
    </center>
+   <left>
+      <StackPane prefWidth="150.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <StackPane prefWidth="150.0" BorderPane.alignment="CENTER" />
+   </right>
+   <top>
+      <StackPane prefHeight="15.0" BorderPane.alignment="CENTER" />
+   </top>
 </BorderPane>

@@ -4,42 +4,47 @@ import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ApplicationCommunicator implements Runnable {
+public class Communicator implements Runnable {
 
     private GameState gameState;
 
-    public ApplicationCommunicator(GameState gameState) {
+    public Communicator(GameState gameState) {
         this.gameState = gameState;
     }
 
-    public void generateNewPlayer(Player player, String bName) {
+    public void initNewPlayer(Player player) {
+        File textFile = generateTextFile(player);
+        player.setFile(textFile);
 
         try {
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", bName);
-            player.setProcess(pb.start());
-            player.collectMessages();
+            Runtime re = Runtime.getRuntime();
+            Process process = re.exec("java -jar javabot.jar " + player.getId()+".txt");
+            player.setProcess(process);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Couldnt start bot!");
-            return;
         }
 
+        writeToFile(player,"C;INIT");
+    }
+
+    private File generateTextFile(Player player) {
+        File playerTextFile;
         try {
-            File f = new File(bName + player.getId() + ".txt");
-            if(f.createNewFile()) {
-                System.out.println("Successfully created text file");
-            } else {
-                System.out.println("Couldnt create text file");
-                return;
-            }
-            player.setFile(f);
-            this.writeToFile(player, "INIT");
+            playerTextFile = new File(player.getId() + ".txt");
+            if(playerTextFile.exists()) System.out.println("Successfully deleted already existing bot file to create a new one!");
+            if(playerTextFile.createNewFile()) System.out.println("Successfully created text file");
+            else System.out.println("Couldnt create text file");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Couldnt create file");
+            return null;
         }
+        return playerTextFile;
     }
 
     private void writeToFile(Player player, String message) {
@@ -57,7 +62,7 @@ public class ApplicationCommunicator implements Runnable {
         try {
             Scanner myReader = new Scanner(player.getFile());
             String data = "";
-            while (myReader.hasNext()) data = myReader.nextLine();
+            while (myReader.hasNext()) data = data + myReader.nextLine();
             return data;
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +83,16 @@ public class ApplicationCommunicator implements Runnable {
     @Override
     public void run() {
 
+        // all players ready
+        if(isReady()) {
+            ArrayList<Player> players = gameState.getPlayers();
+            for(Player player : players) {
 
+
+
+            }
+
+        }
 
     }
 

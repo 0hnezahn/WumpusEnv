@@ -2,10 +2,18 @@ package main.java.de.legoshi.javabot;
 
 public class Bot {
 
-    public static void main(String[] args) {
+    private FileHelper fileHelper;
 
-        System.out.println("Hey " + args[0]);
+    public String gameState;
+    public String command;
 
+    public Bot(FileHelper fileHelper) {
+        this.fileHelper = fileHelper;
+    }
+
+    public void execute() {
+        command = "B;NOTHING";
+        fileHelper.log("test log");
     }
 
 }

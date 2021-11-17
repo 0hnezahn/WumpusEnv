@@ -2,7 +2,8 @@ package de.legoshi.wumpusenv;
 
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
-import de.legoshi.wumpusenv.utils.ApplicationCommunicator;
+import de.legoshi.wumpusenv.utils.Communicator;
+import de.legoshi.wumpusenv.utils.Simulator;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -36,8 +37,9 @@ public class Controller implements Initializable {
     private GameState gameState;
     public Button[][] buttons;
 
-    private ApplicationCommunicator applicationCommunicator;
+    private Communicator communicator;
     private ScheduledExecutorService executorService;
+    private Simulator simulator;
 
     /**
      * Initializes the listeners for sliders aswell as buttons
@@ -47,21 +49,18 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        // add that if application is closed, all running bots are shut down aswell
+        // add extra display with some logging/data tracking (collects all "Sys.out")
+        // add a restart button (resets all bots, the field)
+
         initButtons();
-        this.applicationCommunicator = new ApplicationCommunicator(gameState);
+        communicator = new Communicator(gameState);
+        simulator = new Simulator(gameState);
 
-        StackPane paneL = new StackPane();
-        StackPane paneR = new StackPane();
-        StackPane paneU = new StackPane();
+        executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(communicator,100, 100, TimeUnit.MILLISECONDS);
 
-        paneL.setPrefWidth(150);
-        paneR.setPrefWidth(150);
-        paneU.setPrefHeight(15);
-        borderPane.setLeft(paneL);
-        borderPane.setRight(paneR);
-        borderPane.setTop(paneU);
-
-        rowSlider.valueProperty().addListener((observableValue, number, t1) -> { // check if double is integer
+        rowSlider.valueProperty().addListener((observableValue, number, t1) -> {
             if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
         });
 
@@ -69,12 +68,11 @@ public class Controller implements Initializable {
             if(Math.floor(columnSlider.getValue()) == columnSlider.getValue()) initButtons();
         });
 
-        // add that if application is closed, all running bots are shut down aswell
-        // add extra display with some logging/data tracking (collects all "Sys.out")
-        // add a restart button (resets all bots, the field)
-
     }
 
+    /**
+     * Method thats called when the simulate button is pressed
+     */
     public void onSimulate() {
         if(gameState.isRunning()) {
             System.out.println("Game is currently running");
@@ -86,43 +84,44 @@ public class Controller implements Initializable {
             return;
         }
 
-        this.executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(applicationCommunicator,100, 100, TimeUnit.MILLISECONDS);
-        // start all bots
         // application waits until it recieves "READY" from all bots
         // timeout after 5 seconds
     }
 
+    /**
+     * Method thats called when the abort button is pressed
+     */
     public void onAbort() {
         for(Player p : gameState.getPlayers()) {
-            p.getFile().delete();
+            if(p.getFile().delete()) System.out.println("Successfully deleted files");
             p.getProcess().destroy();
         }
-
         gameState.getPlayers().clear();
         executorService.shutdown();
     }
 
+    /**
+     * Method thats called when the add bot button is pressed
+     */
     public void onAddBot() {
-        ArrayList<Player> players = gameState.getPlayers();
         if(gameState.isRunning()) {
             System.out.println("Game is currently running, press restart to pause");
             return;
         }
 
-        Player player = new Player(players.size());
-
         // for now only .jars
         String bName = botName.getText();
-        applicationCommunicator.generateNewPlayer(player, bName);
+        Player player = new Player(bName);
+        communicator.initNewPlayer(player);
 
-        // end process after app closed
-
-        players.add(player);
+        gameState.getPlayers().add(player);
         System.out.println("Successfully added player!");
     }
 
-    public void onRandomize(ActionEvent event) {
+    /**
+     * Method thats called when the randomize button is pressed
+     */
+    public void onRandomize() {
         if(gameState.isRunning()) {
             System.out.println("Game is currently still running!");
             return;
@@ -134,27 +133,39 @@ public class Controller implements Initializable {
             }
         }
         gameState.generateRandomState();
-        gameState.colorField(gridPane, buttons);
+        gameState.colorField(buttons);
     }
 
+    public void reloadBoard() {
+        for(int row = 0; row < rowSlider.getValue(); row++) {
+            for(int column = 0; column < columnSlider.getValue(); column++) {
+                buttons[row][column].setGraphic(null);
+            }
+        }
+
+        gameState.colorField(buttons);
+    }
+
+    /**
+     * Method thats called when the remove bot button is pressed
+     */
     public void onRemoveBot() {
         if(gameState.isRunning()) {
             System.out.println("Game is currently running, press restart to cancel and remove bots");
             return;
         }
 
-        if(gameState.getPlayers().isEmpty()) {
-            System.out.println("There are no players in the game!");
-            return;
-        }
         System.out.println("Successfully removed player!");
     }
 
+    /**
+     * Method that initiates the button field
+     */
     private void initButtons() {
-        double sliderValRow = rowSlider.getValue();
-        double sliderValCol = columnSlider.getValue();
+        int sliderValRow = (int)rowSlider.getValue();
+        int sliderValCol = (int)columnSlider.getValue();
         gridPane.getChildren().clear();
-        this.buttons = new Button[(int)sliderValRow][(int)sliderValCol];
+        this.buttons = new Button[sliderValRow][sliderValCol];
 
         for(int row = 0; row < sliderValRow; row++) {
             for(int column = 0; column < sliderValCol; column++) {
@@ -166,7 +177,7 @@ public class Controller implements Initializable {
                 buttons[row][column] = b;
             }
         }
-        if(gameState != null) this.gameState.updateGameSize((int) sliderValRow, (int) sliderValCol);
+        if(gameState != null) this.gameState.updateGameSize(sliderValRow, sliderValCol);
     }
 
     public void setGameState(GameState gameState) {

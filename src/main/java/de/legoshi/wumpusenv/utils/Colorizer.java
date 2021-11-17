@@ -17,45 +17,54 @@ public class Colorizer {
     /**
      * Helper class to map states to certain picture.
      * @return picture that is associated with the cell state
-     * @throws FileNotFoundException
      */
-    public static Node colorize(ArrayList<Status> arrayList, Button button) throws FileNotFoundException {
+    public static Node colorize(ArrayList<Status> arrayList, Button button) {
 
         ArrayList<ImageView> imageViews = new ArrayList<>();
 
         for(Status status : arrayList) {
-            switch (status) {
+            try {
+                switch (status) {
 
-                case HOLE -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/hole.jpg");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
+                    case HOLE -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/hole.jpg");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case GOLD -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/gold.jpg");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case WIND -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/wind.jpg");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case STENCH -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/stench.png");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case WUMPUS -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/wumpus.jpg");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case PLAYER -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/stickman.png");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
+                    case START -> {
+                        FileInputStream input = new FileInputStream("./src/main/resources/start.png");
+                        Image image = new Image(input);
+                        imageViews.add(new ImageView(image));
+                    }
                 }
-                case GOLD -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/gold.jpg");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
-                }
-                case WIND -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/wind.jpg");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
-                }
-                case STENCH -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/stench.png");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
-                }
-                case WUMPUS -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/wumpus.jpg");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
-                }
-                case START -> {
-                    FileInputStream input = new FileInputStream("./src/main/resources/stickman.png");
-                    Image image = new Image(input);
-                    imageViews.add(new ImageView(image));
-                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("Couldn't find the image file");
             }
         }
 
@@ -82,7 +91,6 @@ public class Colorizer {
                 ((ImageView) i).setPreserveRatio(true);
             }
         }
-
         return box;
     }
 

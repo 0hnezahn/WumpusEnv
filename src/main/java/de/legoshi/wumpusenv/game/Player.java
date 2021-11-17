@@ -2,6 +2,7 @@ package de.legoshi.wumpusenv.game;
 
 import de.legoshi.wumpusenv.utils.Instruction;
 import de.legoshi.wumpusenv.utils.Status;
+import javafx.geometry.Point2D;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,48 +17,23 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Getter @Setter
-public class Player {
+public class Player extends Entity {
 
-    private int id;
-    private Instruction instruction;
-    private ArrayList<Status> perception;
+    private String id;
     private Process process;
     private File file;
-    private String botName;
 
-    public Player(int id) {
-        this.instruction = Instruction.NOTHING;
-        this.perception = new ArrayList<>();
+    private boolean scream;
+    private boolean alive;
+
+    public Player(String id) {
+        this.id = id;
+        this.alive = true;
+        this.scream = false;
     }
 
-    public void recieveInstruction(Instruction instruction) {
-        this.instruction = instruction;
-    }
-
-    public void recievePerception(ArrayList<Status> perception) {
-        this.instruction = Instruction.NOTHING;
-        this.perception = perception;
-    }
-
-    public void collectMessages() {
-
-        InputStream is = process.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.schedule(() -> {
-            try {
-                System.out.println("started!");
-                while (true) {
-                    String line = br.readLine();
-                    if(line != null) System.out.println(line);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 100, TimeUnit.MILLISECONDS);
-
+    public void setScream() {
+        this.scream = true;
     }
 
 }

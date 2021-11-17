@@ -2,6 +2,7 @@ package de.legoshi.wumpusenv.game;
 
 import de.legoshi.wumpusenv.utils.Colorizer;
 import de.legoshi.wumpusenv.utils.Status;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
@@ -9,17 +10,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
 public class GameState {
 
+    public final int W_COUNT = 1;
+    public final int MIN_H_COUNT = 1;
+
     private FieldStatus[][] game;
     private ArrayList<Player> players;
+    private Wumpus wumpus;
     private boolean isRunning;
 
     public GameState() {
-
         this.game = new FieldStatus[7][7];
         this.isRunning = false;
         this.players = new ArrayList<>();
@@ -31,8 +36,7 @@ public class GameState {
      * @param width width of the games cells
      */
     public void updateGameSize(int height, int width) {
-
-        this.game = new FieldStatus[height][width]; //[y][x]
+        this.game = new FieldStatus[height][width]; //[row - zeile - y][column - spalte - x]
     }
 
     /**
@@ -42,69 +46,53 @@ public class GameState {
      * n Players
      */
     public void generateRandomState() {
-
-        ArrayList<Integer> arrayListAvailable = new ArrayList<>();
         ArrayList<Integer> arrayListChosen = new ArrayList<>();
-
         initState();
 
-        if((2 + players.size()*2) > getHeight()*getWidth()) {
+        int fieldSize = getHeight()*getWidth();
+        int playerCount = players.size();
+        if((W_COUNT+MIN_H_COUNT+playerCount*2) > fieldSize) {
             System.out.println("Nicht genügend Felder zur Verfügung!");
             return;
         }
 
-        for(int i = 0; i < getHeight()*getWidth(); i++) {
-            arrayListAvailable.add(i);
+        ThreadLocalRandom.current().ints(0, fieldSize).distinct().limit(W_COUNT+MIN_H_COUNT+playerCount*2L).forEach(arrayListChosen::add);
+
+        int goldPos = arrayListChosen.get(0);
+        addGold(goldPos/getWidth(),goldPos%getWidth());
+        this.wumpus = new Wumpus();
+
+        for(int i = 0; i < playerCount+1; i++) {
+            int holePos = arrayListChosen.get(W_COUNT+i);
+            addHole(holePos/getWidth(),holePos%getWidth());
         }
 
-        int playerCount = players.size();
-
-        for(int i = 0; i < 2 + playerCount*2; i++) {
-            int randVal;
-            do { randVal = (int) Math.floor(Math.random() * arrayListAvailable.size());
-            } while (arrayListChosen.contains(randVal));
-            arrayListChosen.add(randVal);
-        }
-
-        addGold((int)Math.floor(arrayListChosen.get(0)/getWidth()),arrayListChosen.get(0)%getWidth());
-        for(int i = 0; i < playerCount+1; i++) addHole((int)Math.floor(arrayListChosen.get(1+i)/getWidth()),arrayListChosen.get(1+i)%getWidth());
-        for(int i = 0; i < playerCount; i++) addPlayer((int)Math.floor(arrayListChosen.get(2+i+playerCount)/getWidth()),arrayListChosen.get(2+i+playerCount) % getWidth());
-
-        for(int column = 0; column < getWidth(); column++) {
-            for(int row = 0; row < getHeight(); row++) {
-                if(!game[row][column].getArrayList().isEmpty()) {
-                    System.out.println("x: " + column + "y: " + row + ": " + game[row][column].getArrayList().get(0).toString());
-                } else System.out.println("x: " + column + "y: " + row + ": NOTHING");
-            }
+        for(int i = 0; i < playerCount; i++) {
+            int playerPos = arrayListChosen.get(W_COUNT+MIN_H_COUNT+i+playerCount);
+            addPlayer(playerPos/getWidth(),playerPos%getWidth());
+            players.get(i).setCurrentPosition(new Point2D(playerPos%getWidth(),playerPos/getWidth()));
         }
 
     }
 
     /**
      * Iterates through all buttons existing and adds a picture onto them
-     * @param gridPane Pane that holds all the buttons
      */
-    public void colorField(GridPane gridPane, Button[][] buttons) {
-
-        // column - spalte - x
-        // row - zeile - y
+    public void colorField(Button[][] buttons) {
         for(int column = 0; column < getWidth(); column++) {
             for(int row = 0; row < getHeight(); row++) {
                 if(game[row][column].getArrayList().size() > 0) {
                     try {
                         Button button = buttons[row][column];
                         Node box = Colorizer.colorize(game[row][column].getArrayList(), button);
-                        // vBox.setAlignment(Pos.CENTER);
                         button.setGraphic(box);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println("Something went wrong");
+                        System.out.println("Something went wrong coloring the buttons");
                     }
                 }
             }
         }
-
-
     }
 
     /**
@@ -114,6 +102,7 @@ public class GameState {
      */
     private void addPlayer(int posY, int posX) {
         game[posY][posX].addStatus(Status.START);
+        game[posY][posX].addStatus(Status.PLAYER);
     }
 
     /**
@@ -124,7 +113,6 @@ public class GameState {
     private void addGold(int posY, int posX) {
         game[posY][posX].addStatus(Status.GOLD);
         game[posY][posX].addStatus(Status.WUMPUS);
-        game[posY][posX].addStatus(Status.OCCUPIED);
         addSurrounding(posY, posX, Status.STENCH);
     }
 
@@ -139,6 +127,30 @@ public class GameState {
     }
 
     /**
+     * Helper function to add surrounding field states
+     * @param posY position of field y coordinate
+     * @param posX position of field x coordinate
+     */
+    public void addSurrounding(int posY, int posX, Status status) {
+        if(posX-1 >= 0) game[posY][posX-1].addStatus(status);
+        if(posY-1 >= 0) game[posY-1][posX].addStatus(status);
+        if(posX+1 < getWidth()) game[posY][posX+1].addStatus(status);
+        if(posY+1 < getHeight()) game[posY+1][posX].addStatus(status);
+    }
+
+    /**
+     * Helper function to remove surrounding field states
+     * @param posY position of field y coordinate
+     * @param posX position of field x coordinate
+     */
+    public void removeSurrounding(int posY, int posX, Status status) {
+        if(posX-1 >= 0) game[posY][posX-1].getArrayList().remove(status);
+        if(posY-1 >= 0) game[posY-1][posX].getArrayList().remove(status);
+        if(posX+1 < getWidth()) game[posY][posX+1].getArrayList().remove(status);
+        if(posY+1 < getHeight()) game[posY+1][posX].getArrayList().remove(status);
+    }
+
+    /**
      * Helper function to initialize the field
      */
     public void initState() {
@@ -147,18 +159,6 @@ public class GameState {
                 game[row][column] = new FieldStatus();
             }
         }
-    }
-
-    /**
-     * Helper function to add surrounding fieldstates
-     * @param posY position of field y coordinate
-     * @param posX position of field x coordinate
-     */
-    private void addSurrounding(int posY, int posX, Status status) {
-        if(posX-1 >= 0) game[posY][posX-1].addStatus(status);
-        if(posY-1 >= 0) game[posY-1][posX].addStatus(status);
-        if(posX+1 < getWidth()) game[posY][posX+1].addStatus(status);
-        if(posY+1 < getHeight()) game[posY+1][posX].addStatus(status);
     }
 
     /**

@@ -15,17 +15,10 @@ public class FieldStatus {
     }
 
     public void addStatus(Status status) {
+        if(arrayList.contains(Status.HOLE)) return;
+        if(arrayList.contains(status)) return;
 
-        if(this.arrayList.contains(Status.HOLE)) return;
-        if(status.equals(Status.GOLD) && this.arrayList.contains(Status.GOLD)) return;
-        if(status.equals(Status.WIND) && this.arrayList.contains(Status.WIND)) return;
-        if(status.equals(Status.WUMPUS) && this.arrayList.contains(Status.WUMPUS)) return;
-        if(status.equals(Status.STENCH) && this.arrayList.contains(Status.STENCH)) return;
-        this.arrayList.add(status);
-        if(status.equals(Status.HOLE) && !this.arrayList.isEmpty()) {
-            this.arrayList.clear();
-            this.arrayList.add(status);
-        };
-
+        if(status.equals(Status.HOLE))  arrayList.clear();
+        arrayList.add(status);
     }
 }

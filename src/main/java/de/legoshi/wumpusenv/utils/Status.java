@@ -7,7 +7,7 @@ public enum Status {
     WIND,
     HOLE,
     WUMPUS,
-    OCCUPIED,
+    PLAYER,
     START;
 
 }
