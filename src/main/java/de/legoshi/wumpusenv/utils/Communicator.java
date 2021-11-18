@@ -27,7 +27,6 @@ public class Communicator {
             e.printStackTrace();
             System.out.println("Couldnt start bot!");
         }
-
         writeToFile(player,"C;INIT");
     }
 

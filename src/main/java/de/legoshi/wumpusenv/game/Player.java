@@ -68,4 +68,11 @@ public class Player extends Entity {
         this.climb = args[4].equals("true");
     }
 
+    public void resetInstructions() {
+        this.setInstruction(Instruction.NOTHING);
+        this.scream = false;
+        this.pickup = false;
+        this.climb = false;
+    }
+
 }

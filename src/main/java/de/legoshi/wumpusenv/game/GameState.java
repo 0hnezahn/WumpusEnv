@@ -60,7 +60,8 @@ public class GameState {
 
         int goldPos = arrayListChosen.get(0);
         addGold(goldPos/getWidth(),goldPos%getWidth());
-        this.wumpus = new Wumpus(new Point2D(goldPos%getWidth(),goldPos/getWidth()));
+        Point2D wPos = new Point2D(goldPos%getWidth(),goldPos/getWidth());
+        wumpus = new Wumpus(wPos);
 
         for(int i = 0; i < playerCount+1; i++) {
             int holePos = arrayListChosen.get(W_COUNT+i);

@@ -16,7 +16,6 @@ public class Simulator {
     public void simulateStep() {
 
         wumpusMove();
-        // check for the other states that the player has
 
         for (Player all : gameState.getPlayers()) {
             if(all.isAlive()) {
@@ -50,6 +49,7 @@ public class Simulator {
                     }
                 }
             }
+            all.resetInstructions();
         }
 
         syncWumpus();
@@ -59,14 +59,13 @@ public class Simulator {
     public void sendPlayerStates() {
         for (Player all : gameState.getPlayers()) {
             communicator.writeToFile(all, all.perceptionToString());
-            System.out.println(all.perceptionToString());
+            // System.out.println(all.perceptionToString());
         }
     }
 
     public void receiveInstructions() {
         for (Player all : gameState.getPlayers()) {
-            String message = communicator.readFile(all);
-            all.setStringToPlayer(message);
+            all.setStringToPlayer(communicator.readFile(all));
         }
     }
 
@@ -87,6 +86,9 @@ public class Simulator {
         if (player.getOldPosition().equals(wumpus.getCurrentPosition()) && player.getCurrentPosition().equals(wumpus.getOldPosition())) {
             player.setAlive(false);
         }
+        if(gameState.getGame()[playerY][playerX].getArrayList().contains(Status.HOLE)) {
+            player.setAlive(false);
+        }
     }
 
     public void syncPlayer(Player player) {
@@ -99,11 +101,6 @@ public class Simulator {
             gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
             System.out.println(player.getId() + " just died. F");
             return;
-        }
-
-        if(gameState.getGame()[playerOldY][playerOldX].getArrayList().equals(Status.HOLE)) {
-            gameState.getGame()[playerOldY][playerOldX].getArrayList().remove(Status.PLAYER);
-            player.setAlive(false);
         }
 
         if(player.isHasGold() && player.isHasEscaped()) {
