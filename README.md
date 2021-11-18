@@ -4,7 +4,7 @@ The Enviroment starts its message with "E;...". The bot starts its message with 
 
 Message format for Instructions: \
 "B;MOVE;SCREAM(b);PICKUP(b);CLIMB(b)" where (b) stands for boolean datatype. So for example \
-"B;UP;false,false,false". Notice that you can only have one interaction at once. If you put in more then the first filled in in shown order is taken.
+"B;UP;false,false,false". Notice that you can only have one interaction at once. If you put in more than one, the first filled in in the shown order is taken.
 
 Message format for Status of field/player: \
 "C;[SELF][TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b);ALIVE(b)" \
