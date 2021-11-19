@@ -1,13 +1,17 @@
 package de.legoshi.wumpusenv;
 
+import de.legoshi.wumpusenv.game.FieldStatus;
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
 import de.legoshi.wumpusenv.utils.Communicator;
+import de.legoshi.wumpusenv.utils.FileHelper;
 import de.legoshi.wumpusenv.utils.Simulator;
+import de.legoshi.wumpusenv.utils.Status;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableStringValue;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 import java.net.URL;
@@ -35,19 +39,42 @@ public class Controller implements Initializable {
     public Button abortButton;
     public Label stepLabel;
 
+    public TextField wumpusField;
+    public TextField holeField;
+    public TextField removeY;
+    public TextField removeX;
+    public ChoiceBox addCB;
+    public TextField addY;
+    public TextField addX;
+    public CheckBox customVal;
+    public TextField xSpawn;
+    public TextField ySpawn;
+    public CheckBox cSpawn;
+    public Button customSpawnButton;
+    public Label messageLabel;
+    public Label egg;
+
     private GameState gameState;
     public Button[][] buttons;
 
     private Communicator communicator;
     private Simulator simulator;
 
-    private boolean paused;
-    private boolean generated;
+    private boolean paused = false;
+    private boolean generated = false;
+    private boolean visible = true;
+    private boolean custom = false;
+    private boolean spawn = false;
+
+    private int columnF = 7;
+    private int rowF = 7;
 
     private AtomicInteger step;
+    private ScheduledExecutorService scheduledExecutorService;
 
     /**
      * Initializes the listeners for sliders aswell as buttons
+     *
      * @param url
      * @param resourceBundle
      */
@@ -57,16 +84,41 @@ public class Controller implements Initializable {
         // add extra display with some logging/data tracking (collects all "Sys.out")
         // add a restart button (resets all bots, the field)
 
+        stepLabel.setText("Step: 0");
         initButtons();
-        paused = false;
-        generated = false;
+        addCB.getItems().addAll("Hole", "Wumpus");
+        addCB.setValue("Hole");
 
         rowSlider.valueProperty().addListener((observableValue, number, t1) -> {
-            if(Math.floor(rowSlider.getValue()) == rowSlider.getValue()) initButtons();
+            if (!gameState.isRunning()) {
+                if (Math.floor(rowSlider.getValue()) == rowSlider.getValue()) {
+                    rowF = (int) rowSlider.getValue();
+                    gameState.updateGameSize(columnF, rowF);
+                    initButtons();
+                    generated = false;
+                    FileHelper.writeToLog("Successfully changed amount of rows to " + rowF);
+                    messageLabel.setText("Successfully changed amount of rows to " + rowF);
+                }
+            } else {
+                FileHelper.writeToLog("You cant change the size while the game is running");
+                messageLabel.setText("You cant change the size while the game is running");
+            }
         });
 
         columnSlider.valueProperty().addListener((observableValue, number, t1) -> {
-            if(Math.floor(columnSlider.getValue()) == columnSlider.getValue()) initButtons();
+            if (!gameState.isRunning()) {
+                if (Math.floor(columnSlider.getValue()) == columnSlider.getValue()) {
+                    columnF = (int) columnSlider.getValue();
+                    gameState.updateGameSize(columnF, rowF);
+                    initButtons();
+                    generated = false;
+                    FileHelper.writeToLog("Successfully changed amount of columns to " + columnF);
+                    messageLabel.setText("Successfully changed amount of columns to " + columnF);
+                }
+            } else {
+                FileHelper.writeToLog("You cant change the size while the game is running");
+                messageLabel.setText("You cant change the size while the game is running");
+            }
         });
 
     }
@@ -76,25 +128,22 @@ public class Controller implements Initializable {
      */
     public void onSimulate() {
 
-        if(gameState.isRunning()) {
-            System.out.println("Game is currently running");
+        if (gameState.isRunning()) {
+            FileHelper.writeToLog("Game is already running");
+            messageLabel.setText("Game is already running");
             return;
         }
 
-        if(!generated) {
-            System.out.println("Nothing generated yet!");
-            return;
-        }
-
-        if(gameState.getPlayers().size() <= 0) {
-            System.out.println("Not enough players added");
+        if (gameState.getPlayers().size() <= 0) {
+            FileHelper.writeToLog("Not enough players added");
+            messageLabel.setText("Not enough players added");
             return;
         }
 
         gameState.setRunning(true);
 
         boolean temp = true;
-        while(temp) {
+        while (temp) {
             if (communicator.isReady()) {
                 for (Player all : gameState.getPlayers()) {
                     all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition())); // init state
@@ -103,122 +152,410 @@ public class Controller implements Initializable {
             }
         }
 
-        this.step = new AtomicInteger(1);
+        this.step = new AtomicInteger(0);
         simulator.sendPlayerStates();
-        ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
+        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-            if(!paused) {
+            if (!paused) {
                 if (communicator.isReady()) {
+
+                    // checks if game is over
+                    boolean over = true;
+                    for (Player all : gameState.getPlayers()) {
+                        if (all.isAlive() && !all.isHasEscaped()) {
+                            over = false;
+                            break;
+                        }
+                    }
+
+                    if (over) {
+                        scheduledExecutorService.shutdown();
+                        FileHelper.writeToLog("All players died or escaped and the game is over");
+                        messageLabel.setText("All players died or escaped and the game is over");
+                    }
+
+                    step.incrementAndGet();
                     simulator.receiveInstructions();
                     simulator.simulateStep();
                     for (Player all : gameState.getPlayers()) {
                         all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+                        simulator.setVisible(all.getPlayerVision(), true);
                     }
                     simulator.sendPlayerStates();
                     Platform.runLater(this::reloadBoard);
+                    Platform.runLater(() -> {
+                        stepLabel.setText("Step: " + step.get());
+                    });
                 }
             }
-        }, 100, 100, TimeUnit.MILLISECONDS);
-
-    }
-
-    /**
-     * Method thats called when the abort button is pressed
-     */
-    public void onAbort() {
-        for(Player p : gameState.getPlayers()) {
-            p.getProcess().destroy();
-        }
-        gameState.setRunning(false);
-        gameState.getPlayers().clear();
-
-        for(int row = 0; row < rowSlider.getValue(); row++) {
-            for(int column = 0; column < columnSlider.getValue(); column++) {
-                buttons[row][column].setGraphic(null);
-            }
-        }
+        }, 100, 500, TimeUnit.MILLISECONDS);
+        FileHelper.writeToLog("Successfully started the simulation");
+        messageLabel.setText("Successfully started the simulation");
     }
 
     /**
      * Method thats called when the add bot button is pressed
      */
     public void onAddBot() {
-        if(gameState.isRunning()) {
-            System.out.println("Game is currently running, press restart to pause");
+        if (gameState.isRunning()) {
+            FileHelper.writeToLog("Game is currently running, press restart to pause");
+            messageLabel.setText("Game is currently running, press restart to pause");
             return;
         }
 
-        // for now only .jars
         String bName = botName.getText();
-        Player player = new Player(bName);
+        if (getPlayer(bName) != null) {
+            FileHelper.writeToLog("Bot is already registered under that name");
+            messageLabel.setText("Bot is already registered under that name");
+            return;
+        }
+
+        Player player = new Player(bName, null);
+        if (spawn) {
+            try {
+                int x = Integer.parseInt(xSpawn.getText());
+                int y = Integer.parseInt(ySpawn.getText());
+                player.setCustomSpawn(new Point2D(x, y));
+                reloadBoard();
+            } catch (NumberFormatException e) {
+                FileHelper.writeToLog("Please enter a real number");
+                messageLabel.setText("Please enter a real number");
+                return;
+            }
+        }
+
         communicator.initNewPlayer(player);
 
         gameState.getPlayers().add(player);
-        System.out.println("Successfully added player!");
-    }
+        removeBotCB.getItems().add(bName);
 
-    /**
-     * Method thats called when the randomize button is pressed
-     */
-    public void onRandomize() {
-        if(gameState.isRunning()) {
-            System.out.println("Game is currently still running!");
-            return;
-        }
+        player.setPlayerVision(simulator.getSurroundings(player.getCurrentPosition()));
+        simulator.setVisible(player.getPlayerVision(), true);
+        gameState.addPlayer(new Point2D(0, 0));
 
-        generated = true;
+        removeBot.setDisable(false);
+        removeBotCB.setDisable(false);
 
-        for(int row = 0; row < rowSlider.getValue(); row++) {
-            for(int column = 0; column < columnSlider.getValue(); column++) {
-                buttons[row][column].setGraphic(null);
-            }
-        }
-        gameState.generateRandomState();
-        gameState.colorField(buttons);
-    }
+        removeBotCB.setValue(bName);
 
-    public void reloadBoard() {
-        for(int row = 0; row < rowSlider.getValue(); row++) {
-            for(int column = 0; column < columnSlider.getValue(); column++) {
-                buttons[row][column].setGraphic(null);
-            }
-        }
-
-        gameState.colorField(buttons);
+        reloadBoard();
+        FileHelper.writeToLog("Successfully added player " + bName);
+        messageLabel.setText("Successfully added player " + bName);
     }
 
     /**
      * Method thats called when the remove bot button is pressed
      */
     public void onRemoveBot() {
-        if(gameState.isRunning()) {
-            System.out.println("Game is currently running, press restart to cancel and remove bots");
+        if (gameState.isRunning()) {
+            FileHelper.writeToLog("Game is currently running, press restart to cancel and remove bots");
+            messageLabel.setText("Game is currently running, press restart to cancel and remove bots");
             return;
         }
 
-        System.out.println("Successfully removed player!");
+        String botName = (String) removeBotCB.getValue();
+
+        for (Player all : gameState.getPlayers()) {
+            if (all.getId().equals(botName)) {
+                gameState.getGame()[(int) all.getCurrentPosition().getY()][(int) all.getCurrentPosition().getX()].getArrayList().remove(Status.PLAYER);
+                gameState.getGame()[(int) all.getCurrentPosition().getY()][(int) all.getCurrentPosition().getX()].getArrayList().remove(Status.START);
+                reloadBoard();
+            }
+        }
+
+        gameState.getPlayers().removeIf(all -> all.getId().equals(botName));
+        removeBotCB.getItems().remove(botName);
+
+        if(gameState.getPlayers().size() == 0) {
+            removeBot.setDisable(true);
+            removeBotCB.setDisable(true);
+        }
+        FileHelper.writeToLog("Successfully removed player " + botName);
+        messageLabel.setText("Successfully removed player " + botName);
+    }
+
+    /**
+     * Method thats called when the randomize button is pressed
+     */
+    public void onRandomize() {
+        if (gameState.isRunning()) {
+            FileHelper.writeToLog("Game is currently still running");
+            messageLabel.setText("Game is currently still running");
+            return;
+        }
+
+        int wumpi = 1;
+        int holes = 1;
+
+        try {
+            wumpi = Integer.parseInt(wumpusField.getText());
+            holes = Integer.parseInt(holeField.getText());
+        } catch (NumberFormatException e) {
+            FileHelper.writeToLog("Please enter a real number! Standard values used");
+            messageLabel.setText("Please enter a real number! Standard values used");
+        }
+
+        gameState.setW_COUNT(wumpi);
+        gameState.setMIN_H_COUNT(holes);
+
+        generated = true;
+
+        overwriteButtons();
+        gameState.generateRandomState();
+        for (Player all : gameState.getPlayers()) {
+            all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+            simulator.setVisible(all.getPlayerVision(), true);
+        }
+        gameState.colorField(buttons, visible);
+        FileHelper.writeToLog("Successfully randomized board");
+        messageLabel.setText("Successfully randomized board");
+    }
+
+    /**
+     * Method thats called when the abort button is pressed
+     */
+    public void onAbort() {
+        for (Player p : gameState.getPlayers()) {
+            p.getProcess().destroy();
+        }
+        gameState.setRunning(false);
+        gameState.getPlayers().clear();
+
+        overwriteButtons();
+        overwriteState();
+
+        stepLabel.setText("Step: 0");
+        removeBotCB.getItems().clear();
+        this.paused = false;
+        if (this.scheduledExecutorService != null) {
+            this.scheduledExecutorService.shutdown();
+        }
+
+        removeBot.setDisable(true);
+        removeBotCB.setDisable(true);
+        FileHelper.writeToLog("Successfully aboard the game and removed players");
+        messageLabel.setText("Successfully aboard the game and removed players");
+    }
+
+    public void onPause() {
+        paused = true;
+        FileHelper.writeToLog("Successfully set game state to pause");
+        messageLabel.setText("Successfully set game state to pause");
+    }
+
+    public void onContinue() {
+        paused = false;
+        FileHelper.writeToLog("Successfully set game state to continue");
+        messageLabel.setText("Successfully set game state to continue");
+    }
+
+    public void onVis() {
+        visible = tilesVis.isSelected();
+        if (generated) {
+            gameState.colorField(buttons, visible);
+        } else {
+            initButtons();
+        }
+    }
+
+    public void onCustom() {
+        custom = customVal.isSelected();
+        gameState.setCustomValues(custom);
+        if (custom) {
+            holeField.setDisable(false);
+            wumpusField.setDisable(false);
+        } else {
+            holeField.setDisable(true);
+            wumpusField.setDisable(true);
+        }
+    }
+
+    public void onObjectAdd() {
+        int x, y;
+        try {
+            x = Integer.parseInt(addX.getText());
+            y = Integer.parseInt(addY.getText());
+        } catch (NumberFormatException e) {
+            FileHelper.writeToLog("Please input a real number!");
+            messageLabel.setText("Please input a real number!");
+            return;
+        }
+
+        if (!checkValidInput(x, y)) return;
+
+        if (addCB.getValue().equals("Hole")) {
+            if (gameState.getGame()[y][x].getArrayList().contains(Status.WUMPUS) ||
+                    gameState.getGame()[y][x].getArrayList().contains(Status.PLAYER)) {
+                FileHelper.writeToLog("Already occupied!");
+                messageLabel.setText("Already occupied!");
+                return;
+            } else {
+                gameState.addHole(y, x);
+            }
+        } else if (addCB.getValue().equals("Wumpus")) {
+            if (gameState.getGame()[y][x].getArrayList().contains(Status.HOLE) ||
+                    gameState.getGame()[y][x].getArrayList().contains(Status.PLAYER)) {
+                FileHelper.writeToLog("Already occupied!");
+                messageLabel.setText("Already occupied!");
+                return;
+            } else {
+                gameState.addGold(y, x);
+            }
+        }
+        reloadBoard();
+        FileHelper.writeToLog("Successfully added entity to the board");
+        messageLabel.setText("Successfully added entity to the board");
+    }
+
+    public void onObjectRemove() {
+
+        int x, y;
+        try {
+            x = Integer.parseInt(removeX.getText());
+            y = Integer.parseInt(removeY.getText());
+        } catch (NumberFormatException e) {
+            FileHelper.writeToLog("Please input a real number");
+            messageLabel.setText("Please input a real number!");
+            return;
+        }
+
+        if (!checkValidInput(x, y)) return;
+
+        if (gameState.getGame()[y][x].getArrayList().contains(Status.WUMPUS)) {
+            gameState.getWumpuses().removeIf(wumpus -> wumpus.getCurrentPosition().equals(new Point2D(x, y)));
+            gameState.getGame()[y][x].getArrayList().remove(Status.GOLD);
+            gameState.getGame()[y][x].getArrayList().remove(Status.WUMPUS);
+            gameState.removeSurrounding(y, x, Status.STENCH);
+            reloadBoard();
+            FileHelper.writeToLog("Successfully removed a wumpus from the game");
+            messageLabel.setText("Successfully removed a wumpus from the game");
+            return;
+        }
+        if (gameState.getGame()[y][x].getArrayList().contains(Status.HOLE)) {
+            gameState.getGame()[y][x].getArrayList().remove(Status.HOLE);
+            gameState.removeSurrounding(y, x, Status.WIND);
+            reloadBoard();
+            FileHelper.writeToLog("Successfully removed a hole from the game");
+            messageLabel.setText("Successfully removed a hole from the game");
+            return;
+        }
+        FileHelper.writeToLog("This field cant be deleted. You can only delete: Wumpus, Hole");
+        messageLabel.setText("This field cant be deleted. You can only delete: Wumpus, Hole");
+    }
+
+    public void onSpawn() {
+        spawn = cSpawn.isSelected();
+        gameState.setCustomSpawn(spawn);
+        if (spawn) {
+            xSpawn.setDisable(false);
+            ySpawn.setDisable(false);
+            customSpawnButton.setDisable(false);
+        } else {
+            xSpawn.setDisable(true);
+            ySpawn.setDisable(true);
+            customSpawnButton.setDisable(true);
+        }
+    }
+
+    public void onCustomSpawn() {
+        int x, y;
+        try {
+            x = Integer.parseInt(xSpawn.getText());
+            y = Integer.parseInt(ySpawn.getText());
+        } catch (NumberFormatException e) {
+            FileHelper.writeToLog("Please input a real number");
+            messageLabel.setText("Please input a real number");
+            return;
+        }
+
+        if(gameState.getGame()[y][x].getArrayList().contains(Status.WUMPUS) ||
+                gameState.getGame()[y][x].getArrayList().contains(Status.START) ||
+                gameState.getGame()[y][x].getArrayList().contains(Status.HOLE)) {
+            FileHelper.writeToLog("Field already occupied");
+            messageLabel.setText("Field already occupied");
+            return;
+        }
+
+        if (removeBotCB.getValue() != null) {
+            Player selPlayer = getPlayer(removeBotCB.getValue().toString());
+            Point2D newPlayerPos = new Point2D(x, y);
+            if (selPlayer != null) {
+                if (selPlayer.getCurrentPosition() != null) {
+                    int oldX = (int) selPlayer.getCurrentPosition().getX();
+                    int oldY = (int) selPlayer.getCurrentPosition().getY();
+                    gameState.getGame()[oldY][oldX].getArrayList().remove(Status.PLAYER);
+                    gameState.getGame()[oldY][oldX].getArrayList().remove(Status.START);
+                }
+                gameState.addPlayer(newPlayerPos);
+                selPlayer.setCustomSpawn(newPlayerPos);
+                selPlayer.setCurrentPosition(newPlayerPos);
+            }
+        } else {
+            FileHelper.writeToLog("No bot is selected");
+            messageLabel.setText("No bot is selected");
+            return;
+        }
+        reloadBoard();
+        FileHelper.writeToLog("Successfully set a custom spawn for the player " + removeBotCB);
+        messageLabel.setText("Successfully set a custom spawn for the player " + removeBotCB);
+    }
+
+    public void reloadBoard() {
+        overwriteButtons();
+        gameState.colorField(buttons, visible);
+    }
+
+    public void overwriteButtons() {
+        for (int row = 0; row < rowF; row++) {
+            for (int column = 0; column < columnF; column++) {
+                buttons[row][column].setGraphic(null);
+                buttons[row][column].setText("");
+                if (visible) buttons[row][column].setStyle("-fx-background-color: WHITE");
+                else buttons[row][column].setStyle("-fx-background-color: GRAY");
+            }
+        }
     }
 
     /**
      * Method that initiates the button field
      */
     private void initButtons() {
-        int sliderValRow = (int)rowSlider.getValue();
-        int sliderValCol = (int)columnSlider.getValue();
         gridPane.getChildren().clear();
-        this.buttons = new Button[sliderValRow][sliderValCol];
+        this.buttons = new Button[rowF][columnF];
 
-        for(int row = 0; row < sliderValRow; row++) {
-            for(int column = 0; column < sliderValCol; column++) {
+        for (int row = 0; row < rowF; row++) {
+            for (int column = 0; column < columnF; column++) {
                 Button b = new Button();
-                b.setStyle("-fx-background-color: WHITE");
+                if (visible) b.setStyle("-fx-background-color: WHITE");
+                else b.setStyle("-fx-background-color: GRAY;");
                 b.prefWidthProperty().bind(gridPane.widthProperty());
                 b.prefHeightProperty().bind(gridPane.heightProperty());
                 gridPane.add(b, column, row);
                 buttons[row][column] = b;
             }
         }
-        if(gameState != null) this.gameState.updateGameSize(sliderValRow, sliderValCol);
+        if (gameState != null) this.gameState.updateGameSize(rowF, columnF);
+    }
+
+    public boolean checkValidInput(int x, int y) {
+        return (x >= 0 && x < columnF && y >= 0 && y < rowF);
+    }
+
+    private void overwriteState() {
+        for (int row = 0; row < rowF; row++) {
+            for (int column = 0; column < columnF; column++) {
+                gameState.getGame()[row][column] = new FieldStatus();
+            }
+        }
+    }
+
+    private Player getPlayer(String playerID) {
+        for (Player all : gameState.getPlayers()) {
+            if (all.getId().equals(playerID)) {
+                return all;
+            }
+        }
+        return null;
     }
 
     public void setGameState(GameState gameState) {
@@ -233,11 +570,8 @@ public class Controller implements Initializable {
         this.simulator = simulator;
     }
 
-    public void onPause() {
-        paused = true;
-    }
-
-    public void onContinue() {
-        paused = false;
+    public void egg() {
+        if(egg.getText().equals("sponsored by raid shadow legends")) egg.setText("");
+        else egg.setText("sponsored by raid shadow legends");
     }
 }

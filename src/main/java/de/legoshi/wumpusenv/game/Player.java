@@ -12,8 +12,11 @@ import java.util.Arrays;
 public class Player extends Entity {
 
     private String id;
+    private String name;
     private Process process;
     private File file;
+
+    private Point2D customSpawn;
 
     private boolean scream;
     private boolean pickup;
@@ -23,13 +26,15 @@ public class Player extends Entity {
     private boolean hasGold;
     private boolean hasEscaped;
 
-    public Player(String id) {
+    public Player(String id, Point2D customSpawn) {
         this.playerVision = new PlayerVision();
         this.id = id;
         this.alive = true;
         this.scream = false;
         this.pickup = false;
         this.climb = false;
+
+        this.customSpawn = customSpawn;
 
         this.hasGold = false;
         this.hasEscaped = false;

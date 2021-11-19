@@ -1,6 +1,8 @@
 package de.legoshi.wumpusenv.utils;
 
-public enum Status {
+import java.io.Serializable;
+
+public enum Status implements Serializable {
 
     GOLD,
     STENCH,

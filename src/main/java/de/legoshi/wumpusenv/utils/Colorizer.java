@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import lombok.Setter;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,7 +65,8 @@ public class Colorizer {
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                System.out.println("Couldn't find the image file");
+                FileHelper.writeToLog("Couldnt find the image file");
+                FileHelper.writeToLog(e.getMessage());
             }
         }
 

@@ -2,44 +2,71 @@ package de.legoshi.wumpusenv.utils;
 
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
+import javafx.geometry.Point2D;
+import javafx.scene.control.Label;
+import lombok.Setter;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class Communicator {
 
     private GameState gameState;
+    @Setter private Label messageLabel;
 
     public Communicator(GameState gameState) {
         this.gameState = gameState;
     }
 
     public void initNewPlayer(Player player) {
+        String[] ending = player.getId().split("\\.");
+        player.setName(ending[0]);
         File textFile = generateTextFile(player);
         player.setFile(textFile);
 
+        player.setCurrentPosition(new Point2D(0,0));
+        while(gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.PLAYER) ||
+                gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.HOLE) ||
+                gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.WUMPUS)) {
+            player.setCurrentPosition(new Point2D(Math.random()* gameState.getWidth(),Math.random()*gameState.getHeight()));
+        }
+
         try {
             Runtime re = Runtime.getRuntime();
-            Process process = re.exec("java -jar javabot.jar " + player.getId()+".txt");
-            player.setProcess(process);
-
+            if (ending[1].equals("jar")) {
+                Process process = re.exec("java -jar " + player.getId() + " " + player.getName() + ".txt");
+                player.setProcess(process);
+            } else if (ending[1].equals("py")) {
+                Process process = re.exec("python " + player.getId() + " " + player.getName() + ".txt");
+                player.setProcess(process);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldnt start bot!");
+            messageLabel.setText("Couldnt start bot");
+            FileHelper.writeToLog("Couldnt start bot");
+            FileHelper.writeToLog(e.getMessage());
         }
-        writeToFile(player,"C;INIT");
+
+        writeToFile(player, "C;INIT");
     }
 
     private File generateTextFile(Player player) {
         File playerTextFile;
         try {
-            playerTextFile = new File(player.getId() + ".txt");
-            if(playerTextFile.exists()) System.out.println("Successfully deleted already existing bot file to create a new one!");
-            if(playerTextFile.createNewFile()) System.out.println("Successfully created text file");
-            else System.out.println("Couldnt create text file");
+            playerTextFile = new File(player.getName() + ".txt");
+            if (playerTextFile.exists()) {
+                messageLabel.setText("Successfully deleted already existing bot file to create a new one");
+                FileHelper.writeToLog("Successfully deleted already existing bot file to create a new one");
+            }
+            if (playerTextFile.createNewFile()) {
+                FileHelper.writeToLog("Successfully created text file");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldnt create file");
+            messageLabel.setText("Couldnt create file");
+            FileHelper.writeToLog("Couldnt create file");
+            FileHelper.writeToLog(e.getMessage());
             return null;
         }
         return playerTextFile;
@@ -52,7 +79,9 @@ public class Communicator {
             fileWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldnt open Filewriter");
+            messageLabel.setText("Couldnt open Filewriter");
+            FileHelper.writeToLog("Couldnt open Filewriter");
+            FileHelper.writeToLog(e.getMessage());
         }
     }
 
@@ -65,15 +94,17 @@ public class Communicator {
             return data;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldnt open Filewriter");
+            messageLabel.setText("Couldnt open Filewriter");
+            FileHelper.writeToLog("Couldnt open Filewriter");
+            FileHelper.writeToLog(e.getMessage());
             return "ERROR";
         }
     }
 
     public boolean isReady() {
-        for(Player p : gameState.getPlayers()) {
+        for (Player p : gameState.getPlayers()) {
             String[] m = readFile(p).split(";");
-            if(!m[0].equals("B")) {
+            if (!m[0].equals("B")) {
                 return false;
             }
         }

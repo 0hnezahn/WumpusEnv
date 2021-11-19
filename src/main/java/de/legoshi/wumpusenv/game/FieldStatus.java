@@ -2,15 +2,19 @@ package de.legoshi.wumpusenv.game;
 
 import de.legoshi.wumpusenv.utils.Status;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 
 @Getter
+@Setter
 public class FieldStatus {
 
     private ArrayList<Status> arrayList;
+    private boolean isVisible;
 
     public FieldStatus() {
+        this.isVisible = false;
         this.arrayList = new ArrayList<>();
     }
 

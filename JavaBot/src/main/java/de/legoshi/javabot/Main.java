@@ -7,11 +7,11 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
 
-        //File file = new File("./"+args[0]);
-        //File logFile = new File("./log-"+args[0]);
+        File file = new File("./"+args[0]);
+        File logFile = new File("./log-"+args[0]);
 
-        File file = new File("./javabot.jar.txt");
-        File logFile = new File("./log-javabot.jar.txt");
+        // File file = new File("./javabot.jar.txt");
+        // File logFile = new File("./log-javabot.jar.txt");
 
         FileHelper fileHelper = new FileHelper(file, logFile);
 

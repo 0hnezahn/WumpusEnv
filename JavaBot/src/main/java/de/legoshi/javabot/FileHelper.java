@@ -7,7 +7,6 @@ public class FileHelper {
     private File file;
     private File log;
 
-
     public FileHelper(File file, File log) {
         this.file = file;
         this.log = log;
