@@ -1,29 +1,56 @@
-# coop_wumpus
-Our new approach aims to allow multiple agent approaches to work together on a wumpus environment.
-An executable file in java - which can be fed with the locations of the files for two agents - will simulate one walkthrough in our
-partially observable, strategic, sequential, static, discrete multiagent wumpus world.
+# 1. Introduction
+Our new approach aims to allow multiple agent approaches to work together in a wumpus environment. Other parties are able to develope bots in their perferred language and are then able to load them into the enviroment and let them interact with eachother.
+The enviroment developed in java will simulate one walkthrough in our partially observable, strategic, sequential, static, discrete multiagent wumpus world.
 
-# Wumpus Enviroment
-Code for the Wumpus Enviroment can be found in the src folder. I suggest a communication pattern as follows: \
-The Enviroment starts its message with "E;...". The bot starts its message with "B;...". Each argument or instruction is sperated with a ";".\
+# 2. Wumpus Enviroment
+Code for the Wumpus Enviroment can be found in the src folder. The enviroment is developed in java. It consists of 4 main modules. 
 
-Message format for Instructions: \
-"B;MOVE;SCREAM(b);PICKUP(b);CLIMB(b)" where (b) stands for boolean datatype. So for example \
-"B;UP;false,false,false". Notice that you can only have one interaction at once. If you put in more than one, the first filled in in the shown order is taken.
+### 2.1 Controller
+The controller arranges the functionality of the GUI; for example buttons, labels, sliders and displaying the current gamestate. It also starts and executes the simulation.
 
-Message format for Status of field/player: \
-"C;[SELF][TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b);ALIVE(b)" \
-The vector of scream is initialized with [0,0]
+### 2.2 Gamestate
+The gamestate holds all of the important informations regarding the current game setup. It holds the player and wumpus objects aswell as the fieldstatus.
+Each simulated step, these values are updated by the simulator, synchronized and visually displayed onto the GUI with the help of the controller.
 
-# Java Bot
-The Java Bot implementation is done. It can be found in the JavaBot folder.
-All the algorithmic code goes into the Bot.java file. You can use:
+### 2.3 Simulator
+The simulator takes the current game state and applies its implemented logic onto the objects of the gamestate changeing them as defined below.
+
+### 2.4 Communicator
+The communicator allows the indirect conversation between the enviroment and agent bots with the help of files. Each bot creates itself a text file aswell as a log file. Inside the text file which has the name of the bot, it writes his interactions for the simulator and recieves percerptions from the simulator.
+
+#### 2.4.1 Message formats
+The Enviroment starts its message with "C;" followed by further arguments later explained. The bot starts its message with "B;" with further arguments later explained.
+Each argument or instruction is sperated with a ";".
+
+##### 2.4.2 Message format for instructions:  
+"B;movement;scream;pickup;climb" with:
+
+- movement instruction: "UP", "DOWN", "LEFT", "RIGHT", "NOTHING" 
+- scream instruction: "true", "false" 
+- pickup instruction: "true", "false" 
+- climb instruction: "true", "false"
+
+ALWAYS assign a value for all 'variables'. For example: "B;UP;false,false,false"  
+Notice that you can only set one interaction at once. If you put in or enable more than one interaction, the first in order is used.
+
+##### 2.4.3 Message format for status of field:  
+"C;[self][top];[bottom];[right];[left];[x,y];hasgold;escaped;alive" with:  
+- self, top, bottom, right, left: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD"
+- x, y: Double
+- hasgold: "true", "false"
+- escaped: "true", "false"
+- alive: "true", "false"
+
+The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]".  
+The [x,y] represents a vector of the scream. If no scream was recieved, the vector will be [0.0, 0.0]
+
+### Java Bot
+The Java Bot implementation can be found in the JavaBot folder. All the algorithmic code goes into the Bot.java file. You can use:    
 - fileHelper.log(String message) to log files
 - gameState contains the current game state in string format
 - command has to be assigned the string of interaction that the agent is supposed to do
 
 # World description
-
 ### env
 + wumpus environment is rectangular
 + Agents: one or more wumpi, two Player
