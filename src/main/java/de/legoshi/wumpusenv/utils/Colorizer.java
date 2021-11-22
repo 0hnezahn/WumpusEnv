@@ -11,6 +11,8 @@ import lombok.Setter;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Colorizer {
@@ -19,54 +21,42 @@ public class Colorizer {
      * Helper class to map states to certain picture.
      * @return picture that is associated with the cell state
      */
-    public static Node colorize(ArrayList<Status> arrayList, Button button) {
+    public Node colorize(ArrayList<Status> arrayList, Button button) {
 
         ArrayList<ImageView> imageViews = new ArrayList<>();
 
         for(Status status : arrayList) {
-            try {
-                switch (status) {
+            switch (status) {
 
-                    case HOLE -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/hole.jpg");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case GOLD -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/gold.jpg");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case WIND -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/wind.jpg");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case STENCH -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/stench.png");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case WUMPUS -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/wumpus.jpg");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case PLAYER -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/stickman.png");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
-                    case START -> {
-                        FileInputStream input = new FileInputStream("./src/main/resources/start.jpg");
-                        Image image = new Image(input);
-                        imageViews.add(new ImageView(image));
-                    }
+                case HOLE -> {
+                    Image image = new Image("/hole.jpg");
+                    imageViews.add(new ImageView(image));
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                FileHelper.writeToLog("Couldnt find the image file");
-                FileHelper.writeToLog(e.getMessage());
+                case GOLD -> {
+                    Image image = new Image("/gold.jpg");
+                    imageViews.add(new ImageView(image));
+                }
+                case WIND -> {
+
+                    Image image = new Image("/wind.jpg");
+                    imageViews.add(new ImageView(image));
+                }
+                case STENCH -> {
+                    Image image = new Image("/stench.PNG");
+                    imageViews.add(new ImageView(image));
+                }
+                case WUMPUS -> {
+                    Image image = new Image("/wumpus.jpg");
+                    imageViews.add(new ImageView(image));
+                }
+                case PLAYER -> {
+                    Image image = new Image("/stickman.png");
+                    imageViews.add(new ImageView(image));
+                }
+                case START -> {
+                    Image image = new Image("/start.jpg");
+                    imageViews.add(new ImageView(image));
+                }
             }
         }
 

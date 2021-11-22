@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
@@ -207,6 +208,12 @@ public class Controller implements Initializable {
         if (getPlayer(bName) != null) {
             FileHelper.writeToLog("Bot is already registered under that name");
             messageLabel.setText("Bot is already registered under that name");
+            return;
+        }
+
+        if(!new File(bName).exists()) {
+            FileHelper.writeToLog("Bot is doesnt exist");
+            messageLabel.setText("Bot is doesnt exist");
             return;
         }
 

@@ -106,13 +106,14 @@ public class GameState {
      * Iterates through all buttons existing and adds a picture onto them
      */
     public void colorField(Button[][] buttons, boolean visible) {
+        Colorizer colorizer = new Colorizer();
         for (int column = 0; column < getWidth(); column++) {
             for (int row = 0; row < getHeight(); row++) {
                 if (game[row][column].getArrayList().size() > 0) {
                     try {
                         Button button = buttons[row][column];
                         if (visible || game[row][column].isVisible()) {
-                            Node box = Colorizer.colorize(game[row][column].getArrayList(), button);
+                            Node box = colorizer.colorize(game[row][column].getArrayList(), button);
                             button.setStyle("-fx-background-color: WHITE");
                             button.setGraphic(box);
                             if (game[row][column].getArrayList().contains(Status.PLAYER)) {
