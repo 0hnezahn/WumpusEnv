@@ -1,9 +1,17 @@
 # 1. Introduction
 Our new approach aims to allow multiple agent approaches to work together in a wumpus environment. Other parties are able to develope bots in their perferred language and are then able to load them into the enviroment and let them interact with eachother.
-The enviroment developed in java will simulate one walkthrough in our partially observable, strategic, sequential, static, discrete multiagent wumpus world.
+The environment developed in java will simulate one walkthrough in our partially observable, strategic, sequential, static, discrete multiagent wumpus world.
+
+## 1.1 How to Start
+So far the environment only worked under Windows.  
+Make sure to have Java 17 installed. https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.exe
+
+Open the folder "complete" which has the .jar aswell as an .exe for the environment. Also make sure to have the standard
+java bot in the same folder if you want to spawn in a custom player. Then the only thing left to do is to double click
+either the .jar or the .exe for the environment and a window should open up
 
 # 2. Wumpus Enviroment
-Code for the Wumpus Enviroment can be found in the src folder. The enviroment is developed in java. It consists of 4 main modules. 
+Code for the Wumpus Environment can be found in the src folder. The environment is developed in java. It consists of 4 main modules. 
 
 ### 2.1 Controller
 The controller arranges the functionality of the GUI; for example buttons, labels, sliders and displaying the current gamestate. It also starts and executes the simulation.
@@ -16,10 +24,10 @@ Each simulated step, these values are updated by the simulator, synchronized and
 The simulator takes the current game state and applies its implemented logic onto the objects of the gamestate changeing them as defined below.
 
 ### 2.4 Communicator
-The communicator allows the indirect conversation between the enviroment and agent bots with the help of files. Each bot creates itself a text file aswell as a log file. Inside the text file which has the name of the bot, it writes his interactions for the simulator and recieves percerptions from the simulator.
+The communicator allows the indirect conversation between the environment and agent bots with the help of files. Each bot creates itself a text file aswell as a log file. Inside the text file which has the name of the bot, it writes his interactions for the simulator and recieves percerptions from the simulator.
 
 #### 2.4.1 Message formats
-The Enviroment starts its message with "C;" followed by further arguments later explained. The bot starts its message with "B;" with further arguments later explained.
+The environment starts its message with "C;" followed by further arguments later explained. The bot starts its message with "B;" with further arguments later explained.
 Each argument or instruction is sperated with a ";".
 
 ##### 2.4.2 Message format for instructions:  
@@ -34,8 +42,8 @@ ALWAYS assign a value for all 'variables'. For example: "B;UP;false,false,false"
 Notice that you can only set one interaction at once. If you put in or enable more than one interaction, the first in order is used.
 
 ##### 2.4.3 Message format for status of field:  
-"C;[self][top];[bottom];[right];[left];[x,y];hasgold;escaped;alive" with:  
-- self, top, bottom, right, left: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD"
+"C;[{self}];[x,y];hasgold;escaped;alive" with:  
+- self: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD"
 - x, y: Double
 - hasgold: "true", "false"
 - escaped: "true", "false"

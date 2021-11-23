@@ -48,10 +48,6 @@ public class Player extends Entity {
 
         String s = "C;";
         s = s + listToString(playerVision.getSelf()) + ";";
-        s = s + listToString(playerVision.getTop()) + ";";
-        s = s + listToString(playerVision.getBottom()) + ";";
-        s = s + listToString(playerVision.getRight()) + ";";
-        s = s + listToString(playerVision.getLeft()) + ";";
         s = s + "[" + playerVision.getScream().getX() + "," + playerVision.getScream().getY() + "]" + ";";
         s = s + hasGold + ";";
         s = s + hasEscaped + ";";

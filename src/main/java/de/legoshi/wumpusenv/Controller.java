@@ -147,7 +147,7 @@ public class Controller implements Initializable {
         while (temp) {
             if (communicator.isReady()) {
                 for (Player all : gameState.getPlayers()) {
-                    all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition())); // init state
+                    all.setPlayerVision(simulator.getSelf(all.getCurrentPosition())); // init state
                 }
                 temp = false;
             }
@@ -170,23 +170,21 @@ public class Controller implements Initializable {
                     }
 
                     if (over) {
-                        scheduledExecutorService.shutdown();
                         FileHelper.writeToLog("All players died or escaped and the game is over");
-                        messageLabel.setText("All players died or escaped and the game is over");
+                        Platform.runLater(() -> messageLabel.setText("All players died or escaped and the game is over"));
+                        scheduledExecutorService.shutdown();
                     }
 
                     step.incrementAndGet();
                     simulator.receiveInstructions();
                     simulator.simulateStep();
                     for (Player all : gameState.getPlayers()) {
-                        all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+                        all.setPlayerVision(simulator.getSelf(all.getCurrentPosition()));
                         simulator.setVisible(all.getPlayerVision(), true);
                     }
                     simulator.sendPlayerStates();
                     Platform.runLater(this::reloadBoard);
-                    Platform.runLater(() -> {
-                        stepLabel.setText("Step: " + step.get());
-                    });
+                    Platform.runLater(() -> stepLabel.setText("Step: " + step.get()));
                 }
             }
         }, 100, 500, TimeUnit.MILLISECONDS);
@@ -236,7 +234,7 @@ public class Controller implements Initializable {
         gameState.getPlayers().add(player);
         removeBotCB.getItems().add(bName);
 
-        player.setPlayerVision(simulator.getSurroundings(player.getCurrentPosition()));
+        player.setPlayerVision(simulator.getSelf(player.getCurrentPosition()));
         simulator.setVisible(player.getPlayerVision(), true);
         gameState.addPlayer(new Point2D(0, 0));
 
@@ -266,6 +264,7 @@ public class Controller implements Initializable {
             if (all.getId().equals(botName)) {
                 gameState.getGame()[(int) all.getCurrentPosition().getY()][(int) all.getCurrentPosition().getX()].getArrayList().remove(Status.PLAYER);
                 gameState.getGame()[(int) all.getCurrentPosition().getY()][(int) all.getCurrentPosition().getX()].getArrayList().remove(Status.START);
+                all.getProcess().destroy();
                 reloadBoard();
             }
         }
@@ -310,7 +309,7 @@ public class Controller implements Initializable {
         overwriteButtons();
         gameState.generateRandomState();
         for (Player all : gameState.getPlayers()) {
-            all.setPlayerVision(simulator.getSurroundings(all.getCurrentPosition()));
+            all.setPlayerVision(simulator.getSelf(all.getCurrentPosition()));
             simulator.setVisible(all.getPlayerVision(), true);
         }
         gameState.colorField(buttons, visible);
@@ -517,8 +516,8 @@ public class Controller implements Initializable {
             for (int column = 0; column < columnF; column++) {
                 buttons[row][column].setGraphic(null);
                 buttons[row][column].setText("");
-                if (visible) buttons[row][column].setStyle("-fx-background-color: WHITE");
-                else buttons[row][column].setStyle("-fx-background-color: GRAY");
+                if (visible) buttons[row][column].setStyle("-fx-background-color: WHITE;-fx-border-color: BLACK");
+                else buttons[row][column].setStyle("-fx-background-color: GRAY;-fx-border-color: BLACK");
             }
         }
     }
@@ -533,8 +532,8 @@ public class Controller implements Initializable {
         for (int row = 0; row < rowF; row++) {
             for (int column = 0; column < columnF; column++) {
                 Button b = new Button();
-                if (visible) b.setStyle("-fx-background-color: WHITE");
-                else b.setStyle("-fx-background-color: GRAY;");
+                if (visible) b.setStyle("-fx-background-color: WHITE;-fx-border-color: BLACK");
+                else b.setStyle("-fx-background-color: GRAY;-fx-border-color: BLACK");
                 b.prefWidthProperty().bind(gridPane.widthProperty());
                 b.prefHeightProperty().bind(gridPane.heightProperty());
                 gridPane.add(b, column, row);

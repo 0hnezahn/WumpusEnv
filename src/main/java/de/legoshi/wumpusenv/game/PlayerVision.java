@@ -11,10 +11,6 @@ import java.io.Serializable;
 public class PlayerVision implements Serializable {
 
     private FieldStatus self;
-    private FieldStatus top;
-    private FieldStatus bottom;
-    private FieldStatus left;
-    private FieldStatus right;
     private Point2D scream;
 
 }

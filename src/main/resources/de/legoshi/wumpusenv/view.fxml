@@ -45,7 +45,7 @@
             <CheckBox fx:id="tilesVis" layoutX="887.0" layoutY="31.0" mnemonicParsing="false" onAction="#onVis" selected="true" text="Visibility" />
             <Button fx:id="objectAddButton" layoutX="615.0" layoutY="27.0" mnemonicParsing="false" onAction="#onObjectAdd" prefHeight="25.0" prefWidth="104.0" text="Add" />
             <Separator layoutX="869.0" layoutY="1.0" orientation="VERTICAL" prefHeight="203.0" prefWidth="5.0" />
-            <Separator layoutX="-4.0" layoutY="2.0" prefHeight="4.0" prefWidth="1008.0" />
+            <Separator layoutX="-4.0" layoutY="-5.0" prefHeight="11.0" prefWidth="1008.0" />
             <Separator layoutX="242.0" layoutY="1.0" orientation="VERTICAL" prefHeight="204.0" prefWidth="7.0" />
             <Separator layoutX="385.0" layoutY="4.0" orientation="VERTICAL" prefHeight="200.0" />
             <Separator layoutX="599.0" layoutY="1.0" orientation="VERTICAL" prefHeight="204.0" prefWidth="7.0" />
@@ -73,7 +73,7 @@
       </Pane>
    </bottom>
    <center>
-      <GridPane fx:id="gridPane" alignment="CENTER" pickOnBounds="false" prefHeight="303.0" prefWidth="303.0" BorderPane.alignment="CENTER">
+      <GridPane fx:id="gridPane" alignment="CENTER" pickOnBounds="false" prefHeight="761.0" prefWidth="710.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" />
             <Button layoutX="204.0" mnemonicParsing="false" prefHeight="101.0" prefWidth="101.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />

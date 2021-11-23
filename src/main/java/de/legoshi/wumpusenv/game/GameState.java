@@ -114,7 +114,7 @@ public class GameState {
                         Button button = buttons[row][column];
                         if (visible || game[row][column].isVisible()) {
                             Node box = colorizer.colorize(game[row][column].getArrayList(), button);
-                            button.setStyle("-fx-background-color: WHITE");
+                            button.setStyle("-fx-background-color: WHITE;-fx-border-color: BLACK");
                             button.setGraphic(box);
                             if (game[row][column].getArrayList().contains(Status.PLAYER)) {
                                 for (Player all : players) {
@@ -124,7 +124,7 @@ public class GameState {
                                 }
                             }
                         } else if (!game[row][column].isVisible()) {
-                            button.setStyle("-fx-background-color: GRAY");
+                            button.setStyle("-fx-background-color: GRAY;-fx-border-color: BLACK");
                             button.setGraphic(null);
                             button.setText("");
                         }
@@ -137,9 +137,9 @@ public class GameState {
                 } else {
                     Button button = buttons[row][column];
                     if (visible || game[row][column].isVisible()) {
-                        button.setStyle("-fx-background-color: WHITE");
+                        button.setStyle("-fx-background-color: WHITE;-fx-border-color: BLACK");
                     } else if (!game[row][column].isVisible()) {
-                        button.setStyle("-fx-background-color: GRAY");
+                        button.setStyle("-fx-background-color: GRAY;-fx-border-color: BLACK");
                     }
                 }
             }

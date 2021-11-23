@@ -77,10 +77,6 @@ public class Simulator {
     }
 
     public void setVisible(PlayerVision playerVision, boolean val) {
-        if(playerVision.getLeft() != null) playerVision.getLeft().setVisible(val);
-        if(playerVision.getRight() != null) playerVision.getRight().setVisible(val);
-        if(playerVision.getTop() != null) playerVision.getTop().setVisible(val);
-        if(playerVision.getBottom() != null) playerVision.getBottom().setVisible(val);
         if(playerVision.getSelf() != null) playerVision.getSelf().setVisible(val);
     }
 
@@ -156,34 +152,34 @@ public class Simulator {
     public void wumpusMove() {
 
         for(Wumpus wumpus : gameState.getWumpuses()) {
-            PlayerVision playerVision = getSurroundings(wumpus.getCurrentPosition());
+            WumpusVision wumpusVision = getSurroundings(wumpus.getCurrentPosition());
 
             Point2D wumpusSpawn = wumpus.getWumpusSpawn();
             Point2D wumpusCurr = wumpus.getCurrentPosition();
             Point2D wumpusOld = wumpus.getOldPosition();
 
-            if (playerVision.getLeft() != null && playerVision.getLeft().getArrayList().contains(Status.PLAYER)) {
+            if (wumpusVision.getLeft() != null && wumpusVision.getLeft().getArrayList().contains(Status.PLAYER)) {
                 wumpus.setInstruction(Instruction.LEFT);
                 wumpus.updatePosition();
                 if (wumpus.spawnDistance() > 2) {
                     wumpus.setCurrentPosition(wumpusOld);
                 } else return;
             }
-            if (playerVision.getRight() != null && playerVision.getRight().getArrayList().contains(Status.PLAYER)) {
+            if (wumpusVision.getRight() != null && wumpusVision.getRight().getArrayList().contains(Status.PLAYER)) {
                 wumpus.setInstruction(Instruction.RIGHT);
                 wumpus.updatePosition();
                 if (wumpus.spawnDistance() > 2) {
                     wumpus.setCurrentPosition(wumpusOld);
                 } else return;
             }
-            if (playerVision.getTop() != null && playerVision.getTop().getArrayList().contains(Status.PLAYER)) {
+            if (wumpusVision.getTop() != null && wumpusVision.getTop().getArrayList().contains(Status.PLAYER)) {
                 wumpus.setInstruction(Instruction.UP);
                 wumpus.updatePosition();
                 if (wumpus.spawnDistance() > 2) {
                     wumpus.setCurrentPosition(wumpusOld);
                 } else return;
             }
-            if (playerVision.getBottom() != null && playerVision.getBottom().getArrayList().contains(Status.PLAYER)) {
+            if (wumpusVision.getBottom() != null && wumpusVision.getBottom().getArrayList().contains(Status.PLAYER)) {
                 wumpus.setInstruction(Instruction.DOWN);
                 wumpus.updatePosition();
                 if (wumpus.spawnDistance() > 2) {
@@ -231,8 +227,8 @@ public class Simulator {
         }
     }
 
-    public PlayerVision getSurroundings(Point2D point2D) {
-        PlayerVision vision = new PlayerVision();
+    public WumpusVision getSurroundings(Point2D point2D) {
+        WumpusVision vision = new WumpusVision();
 
         int maxX = gameState.getWidth();
         int maxY = gameState.getHeight();
@@ -250,6 +246,17 @@ public class Simulator {
 
         if (posY - 1 >= 0) vision.setTop(gameState.getGame()[posY - 1][posX]);
         else vision.setTop(null);
+
+        vision.setSelf(gameState.getGame()[posY][posX]);
+
+        return vision;
+    }
+
+    public PlayerVision getSelf(Point2D point2D) {
+        PlayerVision vision = new PlayerVision();
+
+        int posX = (int) point2D.getX();
+        int posY = (int) point2D.getY();
 
         vision.setSelf(gameState.getGame()[posY][posX]);
 
