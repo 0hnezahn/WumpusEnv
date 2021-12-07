@@ -5,8 +5,9 @@ public class Bot {
     private FileHelper fileHelper;
 
     public String gameState;
+    public String[] statearray = gameState.split(";"); 
     public String command;
-    public int  = 20;
+    public int width = 20;
     public int height = 20;
     public String up = "B;UP;false;false;false";
     public String down = "B;DOWN;false;false;false";
@@ -56,24 +57,24 @@ public class Bot {
 
     public void execute() {
     	
-    	private int x = 0;
-    	private int y = 0;
+    	int x = 0;
+    	int y = 0;
     	
-    	while(gameState[5] == true && gameState[4] == false) {
+    	while(statearray[5] == true && statearray[4] == false) {
     		
-    		if(gameState [1] == "GOLD" && x == 0 && y == 0) {
+    		if(statearray [1] == "GOLD" && x == 0 && y == 0) {
     			
     			command = climb;
     			
-    		} else if(gameState[1] == "WIND") {
+    		} else if(statearray[1] == "WIND") {
     			
     			danger(x,y);
     			
-    		} else if(gameState[1] == "STENCH") {
+    		} else if(statearray[1] == "STENCH") {
     			
     			danger(x,y);
     			
-    		} else if(gameState[1] == "GOLD") {
+    		} else if(statearray[1] == "GOLD") {
     			
     			command = pickup;
     			
