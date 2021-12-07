@@ -30,7 +30,8 @@ public class Main {
                     if(message[0].equals("C") && message[1].equals("INIT")) {
                         String readyMessage = "B;READY";
                         fileHelper.writeToFile(readyMessage);
-                        message = readyMessage.split(";");
+                        bot.width = Integer.parseInt(message[2]);
+                        bot.height = Integer.parseInt(message[3]);
                     }
                 }
                 if(message[0].equals("C")) {
@@ -41,9 +42,9 @@ public class Main {
                     fileHelper.log("[" + java.time.LocalDateTime.now() + "] " + initMessage + "\r\n");
 
                     bot.gameState = initMessage;
-
                     bot.execute();
                     fileHelper.writeToFile(bot.command);
+
                     fileHelper.log("[" + java.time.LocalDateTime.now() + "] BOT PERFORMED: " + "\r\n");
                     fileHelper.log("[" + java.time.LocalDateTime.now() + "] " + bot.command + "\r\n");
                     fileHelper.log("--------------------------------------- \r\n");

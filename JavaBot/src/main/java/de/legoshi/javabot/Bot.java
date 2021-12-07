@@ -6,7 +6,7 @@ public class Bot {
 
     public String gameState;
     public String command;
-    public int  = 20;
+    public int width = 20;
     public int height = 20;
     public String up = "B;UP;false;false;false";
     public String down = "B;DOWN;false;false;false";
@@ -51,12 +51,13 @@ public class Bot {
     	if(prob[(width/2)-1+x][(width/2)-1+y+1] < prob[(width/2)-1+x][(width/2)-1+y-1]) {
     		
     	}
-    	
+
+        return null;
     }
 
     public void execute() {
     	
-    	private int x = 0;
+    	/* private int x = 0;
     	private int y = 0;
     	
     	while(gameState[5] == true && gameState[4] == false) {
@@ -83,7 +84,7 @@ public class Bot {
     			visited[(width/2)-1+x][(width/2)-1+y] = true;
     		}
     		
-    	}
+    	} */
     	
         command = "B;UP;false;false;false";
         fileHelper.log("test log");

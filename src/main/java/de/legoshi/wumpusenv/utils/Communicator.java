@@ -48,7 +48,7 @@ public class Communicator {
             FileHelper.writeToLog(e.getMessage());
         }
 
-        writeToFile(player, "C;INIT");
+        writeToFile(player, "C;INIT;" + gameState.getWidth() + ";" + gameState.getHeight() + ";END");
     }
 
     private File generateTextFile(Player player) {

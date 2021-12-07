@@ -11,8 +11,8 @@ The environment developed in java will simulate one walkthrough in our partially
 ### 2.2 States
 + gold: contains one gold
 + pit: kills agent
-+ breeze: in von Neumnann neighborhood to pit
-+ stench: in von Neumnann neighborhood to wumpus
++ breeze: in von Neumann neighborhood to pit
++ stench: in von Neumann neighborhood to wumpus
 + vector: pointing from one agents position to the scream location
 
 ### 2.3 Requirements
@@ -80,7 +80,8 @@ The communicator allows the indirect conversation between the environment and ag
 
 #### 5.4.1 Message formats
 The environment starts its message with "C;" followed by further arguments later explained. The bot starts its message with "B;" with further arguments later explained.
-Each argument or instruction is sperated with a ";".
+Each argument or instruction is sperated with a ";". HINT: the first message received is of the format: 
+C;INIT;width;height;END
 
 ##### 5.4.2 Message format for instructions:  
 "B;movement;scream;pickup;climb" with:
@@ -94,15 +95,15 @@ ALWAYS assign a value for all 'variables'. For example: "B;UP;false,false,false"
 Notice that you can only set one interaction at once. If you put in or enable more than one interaction, the first in order is used.
 
 ##### 5.4.3 Message format for status of field:  
-"C;[{self}];[x,y];hasgold;escaped;alive" with:  
+"C;[self];[x,y];hasgold;escaped;alive" with:  
 - self: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD"
 - x, y: Double
 - hasgold: "true", "false"
 - escaped: "true", "false"
 - alive: "true", "false"
 
-The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]".  
-The [x,y] represents a vector of the scream. If no scream was recieved, the vector will be [0.0, 0.0]
+The value self can be repeated such as "[STENCH, WIND]".  
+The [x,y] represents a vector of the scream. If no scream was received, the vector will be [0.0, 0.0]
 
 # 6. Java Bot
 The Java Bot implementation can be found in the JavaBot folder. All the algorithmic code goes into the Bot.java file. You can use:    
