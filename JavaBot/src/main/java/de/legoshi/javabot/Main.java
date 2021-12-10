@@ -3,6 +3,10 @@ package main.java.de.legoshi.javabot;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {

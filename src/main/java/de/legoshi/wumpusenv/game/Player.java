@@ -8,6 +8,10 @@ import lombok.Setter;
 import java.io.File;
 import java.util.Arrays;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter @Setter
 public class Player extends Entity {
 
@@ -40,8 +44,6 @@ public class Player extends Entity {
         this.hasEscaped = false;
     }
 
-    //B;MOVE;SCREAM(b);PICKUP(b);CLIMB(b)
-    //C;[TOP,TOP];[BOTTOM];[RIGHT];[LEFT];[X,Y];HASGOLD(b);ESCAPED(b);ALIVE(b)
     public String perceptionToString() {
 
         if(playerVision.getScream() == null) this.playerVision.setScream(new Point2D(0,0));

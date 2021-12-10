@@ -6,6 +6,10 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 public class PlayerVision implements Serializable {

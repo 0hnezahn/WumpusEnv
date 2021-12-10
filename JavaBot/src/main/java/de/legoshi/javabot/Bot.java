@@ -1,5 +1,11 @@
 package main.java.de.legoshi.javabot;
 
+/**
+ * @author Benjamin Müller
+ * @author Julia
+ * @author Yazar Strulik
+ */
+
 public class Bot {
 
     private FileHelper fileHelper;

@@ -13,6 +13,10 @@ import javafx.stage.WindowEvent;
 import java.io.IOException;
 import java.util.SortedMap;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class Application extends javafx.application.Application {
 
     private GameState gameState;

@@ -10,6 +10,10 @@ import java.io.*;
 import java.util.Collection;
 import java.util.Scanner;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class Communicator {
 
     private GameState gameState;

@@ -4,6 +4,10 @@ import javafx.geometry.Point2D;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 public class Wumpus extends Entity {

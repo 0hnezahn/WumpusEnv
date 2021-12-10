@@ -15,6 +15,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 public class GameState {

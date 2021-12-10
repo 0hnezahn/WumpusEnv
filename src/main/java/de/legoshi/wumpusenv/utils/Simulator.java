@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class Simulator {
 
     private GameState gameState;

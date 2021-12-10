@@ -22,6 +22,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class Controller implements Initializable {
 
     public Slider rowSlider;

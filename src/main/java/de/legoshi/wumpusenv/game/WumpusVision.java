@@ -3,6 +3,10 @@ package de.legoshi.wumpusenv.game;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 public class WumpusVision {

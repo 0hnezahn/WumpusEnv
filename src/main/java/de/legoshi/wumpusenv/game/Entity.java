@@ -5,6 +5,10 @@ import javafx.geometry.Point2D;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 abstract class Entity {

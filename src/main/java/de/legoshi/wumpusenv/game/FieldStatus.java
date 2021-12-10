@@ -6,6 +6,10 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
+/**
+ * @author Benjamin Müller
+ */
+
 @Getter
 @Setter
 public class FieldStatus {

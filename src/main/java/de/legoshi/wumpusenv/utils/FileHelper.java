@@ -3,7 +3,10 @@ package de.legoshi.wumpusenv.utils;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
+
+/**
+ * @author Benjamin Müller
+ */
 
 public class FileHelper {
 

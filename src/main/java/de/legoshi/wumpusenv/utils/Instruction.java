@@ -1,5 +1,9 @@
 package de.legoshi.wumpusenv.utils;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public enum Instruction {
 
     INIT,

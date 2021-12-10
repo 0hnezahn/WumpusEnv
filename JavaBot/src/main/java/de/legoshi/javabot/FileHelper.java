@@ -2,6 +2,10 @@ package main.java.de.legoshi.javabot;
 
 import java.io.*;
 
+/**
+ * @author Benjamin Müller
+ */
+
 public class FileHelper {
 
     private File file;
