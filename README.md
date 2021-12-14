@@ -50,6 +50,12 @@ Pick up a piece of gold and leave as fast as possible
 - turn: The agent can turn only once per turn either to the left or to the right, changing its facing direction.
 - nothing: Stand one turn without taking an action
 
+NOTE: The Wumpus movement is defined as follows:  
+`if abs(w_spawnX - w_nextX) < 2 AND abs(w_spawnY - w_nextY) < 2:
+    follow player
+else:
+    move back home`
+
 ### 3.5 Target of the Wumpus agent
 The goal of the Wumpus agent is to protect the gold from the competing agents and keep it himself.
 
