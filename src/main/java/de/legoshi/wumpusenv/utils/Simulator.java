@@ -17,7 +17,8 @@ public class Simulator {
     private GameState gameState;
     private Communicator communicator;
 
-    @Setter private Label messageLabel;
+    @Setter
+    private Label messageLabel;
 
     public Simulator(GameState gameState, Communicator communicator) {
         this.gameState = gameState;
@@ -54,22 +55,20 @@ public class Simulator {
                         }
                     } else if (all.isClimb()) {
                         if (fieldStatus.contains(Status.START)) {
-                            if (all.isHasGold()) {
-                                all.setHasEscaped(true);
-                                messageLabel.setText(all.getId() + " has escaped with gold and won");
-                                FileHelper.writeToLog(all.getId() + " has escaped with gold and won");
-                            } else if (all.isHasEscaped()) {
-                                messageLabel.setText(all.getId() + " has escaped");
-                                FileHelper.writeToLog(all.getId() + " has escaped");
-                            }
+                            all.setHasEscaped(true);
+                            Platform.runLater(() -> messageLabel.setText(all.getId() + " has escaped"));
+                            FileHelper.writeToLog(all.getId() + " has escaped");
+
                         }
                     } else if (all.isPickup()) {
                         if (fieldStatus.contains(Status.GOLD)) {
                             all.setHasGold(true);
                             fieldStatus.remove(Status.GOLD);
-                            messageLabel.setText(all.getId() + " has collected the gold");
+                            Platform.runLater(() ->messageLabel.setText(all.getId() + " has collected the gold"));
                             FileHelper.writeToLog(all.getId() + " has collected the gold");
                         }
+                    } else {
+                        all.setOldPosition(all.getCurrentPosition());
                     }
                 }
                 validatePlayerPos(all);
@@ -81,7 +80,7 @@ public class Simulator {
     }
 
     public void setVisible(PlayerVision playerVision, boolean val) {
-        if(playerVision.getSelf() != null) playerVision.getSelf().setVisible(val);
+        if (playerVision.getSelf() != null) playerVision.getSelf().setVisible(val);
     }
 
     public void sendPlayerStates() {
@@ -107,7 +106,7 @@ public class Simulator {
             player.setCurrentPosition(player.getOldPosition());
             player.setOldPosition(player.getOldPosition());
         }
-        for(Wumpus wumpus : gameState.getWumpuses()) {
+        for (Wumpus wumpus : gameState.getWumpuses()) {
             if (player.getCurrentPosition().equals(wumpus.getCurrentPosition())) {
                 player.setAlive(false);
             }
@@ -115,7 +114,7 @@ public class Simulator {
                 player.setAlive(false);
             }
         }
-        if(gameState.getGame()[(int)player.getCurrentPosition().getY()][(int)player.getCurrentPosition().getX()].getArrayList().contains(Status.HOLE)) {
+        if (gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.HOLE)) {
             player.setAlive(false);
         }
     }
@@ -136,12 +135,14 @@ public class Simulator {
             return;
         }
 
-        if(player.isHasGold() && player.isHasEscaped()) {
+        if (player.isHasGold() && player.isHasEscaped()) {
+            fieldStatus.remove(Status.PLAYER);
             fieldStatusOld.remove(Status.PLAYER);
             return;
         }
 
         fieldStatusOld.remove(Status.PLAYER);
+        fieldStatus.remove(Status.PLAYER);
         fieldStatus.add(Status.PLAYER);
     }
 
@@ -155,7 +156,7 @@ public class Simulator {
 
     public void wumpusMove() {
 
-        for(Wumpus wumpus : gameState.getWumpuses()) {
+        for (Wumpus wumpus : gameState.getWumpuses()) {
             WumpusVision wumpusVision = getSurroundings(wumpus.getCurrentPosition());
 
             Point2D wumpusSpawn = wumpus.getWumpusSpawn();
@@ -217,13 +218,14 @@ public class Simulator {
     }
 
     public void syncWumpus() {
-        for(Wumpus wumpus : gameState.getWumpuses()) {
+        for (Wumpus wumpus : gameState.getWumpuses()) {
             int wOldX = (int) wumpus.getOldPosition().getX();
             int wOldY = (int) wumpus.getOldPosition().getY();
             int wX = (int) wumpus.getCurrentPosition().getX();
             int wY = (int) wumpus.getCurrentPosition().getY();
 
             gameState.getGame()[wOldY][wOldX].getArrayList().remove(Status.WUMPUS);
+            gameState.getGame()[wY][wX].getArrayList().remove(Status.WUMPUS);
             gameState.getGame()[wY][wX].getArrayList().add(Status.WUMPUS);
             gameState.removeSurrounding(wOldY, wOldX, Status.STENCH);
             gameState.addSurrounding(wY, wX, Status.STENCH);
