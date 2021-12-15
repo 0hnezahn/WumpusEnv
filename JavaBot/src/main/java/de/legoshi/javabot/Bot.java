@@ -1,8 +1,10 @@
 package main.java.de.legoshi.javabot;
 
+import java.util.Arrays;
+
 /**
  * @author Benjamin Müller
- * @author Julia
+ * @author Julia Koch
  * @author Yazar Strulik
  */
 
@@ -22,9 +24,12 @@ public class Bot {
     private FileHelper fileHelper;
     //gameState = "C;[self];[x,y];hasgold;escaped;alive" = C;[START,PLAYER];[0.0,0.0];false;false;true
     public String gameState;
-    //statearray[1] = "[START,PLAYER]"
-    public String[] statearray = gameState.split(";");
+    //gamearray[1] = "[START,PLAYER]"
+    public String[] gamearray = gameState.split(";");
     public String command;
+    
+    public String statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+    public String[] statearray = statestring.split(",");
 
     //Width und Height werden beim execute gesetzt
     public int width;
@@ -82,27 +87,25 @@ public class Bot {
     	int x = width/2;
     	int y = height/2;
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-    		if(statearray[1].equals("GOLD") && x == 0 && y == 0) {
+    		if(Arrays.asList(statearray).contains("GOLD")) && x == 0 && y == 0) {
 
     			command = climb;
         //Wenn Wind -> Felder mit Gefahr markieren
-    		} else if(statearray[1].equals("WIND")) {
+    		} else if(Arrays.asList(statearray).contains("WIND")) {
 
     			danger(x,y);
         //Wenn Gestank -> Felder mit Gefahr markieren
-    		} else if(statearray[1].equals("STENCH")) {
+    		} else if(Arrays.asList(statearray).contains("STENCH")) {
 
     			danger(x,y);
         //Wenn Gold -> Gold aufheben
-    		} else if(statearray[1].equals("GOLD")) {
+    		} else if(Arrays.asList(statearray).contains("GOLD")) {
 
     			command = pickup;
 
     		}
         //Weg mit wenigster Gefahr gehen
 
-
-        command = "B;UP;false;false;false";
         fileHelper.log("test log");
     }
 
