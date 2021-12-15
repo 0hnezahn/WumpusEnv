@@ -3,6 +3,7 @@ package de.legoshi.wumpusenv;
 import de.legoshi.wumpusenv.game.FieldStatus;
 import de.legoshi.wumpusenv.game.GameState;
 import de.legoshi.wumpusenv.game.Player;
+import de.legoshi.wumpusenv.game.Wumpus;
 import de.legoshi.wumpusenv.utils.Communicator;
 import de.legoshi.wumpusenv.utils.FileHelper;
 import de.legoshi.wumpusenv.utils.Simulator;
@@ -191,7 +192,8 @@ public class Controller implements Initializable {
                     Platform.runLater(() -> stepLabel.setText("Step: " + step.get()));
                 }
             }
-        }, 100, 500, TimeUnit.MILLISECONDS);
+        }, 100, 2000, TimeUnit.MILLISECONDS);
+        reloadBoard();
         FileHelper.writeToLog("Successfully started the simulation");
         messageLabel.setText("Successfully started the simulation");
     }
@@ -330,6 +332,7 @@ public class Controller implements Initializable {
         }
         gameState.setRunning(false);
         gameState.getPlayers().clear();
+        gameState.getWumpuses().clear();
 
         overwriteButtons();
         overwriteState();
@@ -410,6 +413,7 @@ public class Controller implements Initializable {
                 return;
             } else {
                 gameState.addGold(y, x);
+                gameState.getWumpuses().add(new Wumpus(new Point2D(x,y)));
             }
         }
         reloadBoard();
