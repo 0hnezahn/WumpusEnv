@@ -25,16 +25,10 @@ public class Bot {
     private FileHelper fileHelper;
     //gameState = "C;[self];[x,y];hasgold;escaped;alive" = C;[START,PLAYER];[0.0,0.0];false;false;true
     public String gameState;
-<<<<<<< HEAD
-    //statearray[1] = "[START,PLAYER]"
-    public String[] statearray = gameState.split(";");
-    //Botanweisungen werden aus command gezogen
-=======
     //gamearray[1] = "[START,PLAYER]"
     public String[] gamearray = gameState.split(";");
->>>>>>> 967292b3d45c913974c2b74f4f43f6dcb3c279e6
     public String command;
-    
+
     public String statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
     public String[] statearray = statestring.split(",");
 
@@ -130,11 +124,7 @@ public class Bot {
       }
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-<<<<<<< HEAD
-    		if(statearray[1].equals("GOLD") && x == x0 && y == y0) {
-=======
     		if(Arrays.asList(statearray).contains("GOLD")) && x == 0 && y == 0) {
->>>>>>> 967292b3d45c913974c2b74f4f43f6dcb3c279e6
 
     			command = climb;
         //Wenn Wind -> Felder mit Gefahr markieren
@@ -153,11 +143,7 @@ public class Bot {
     		}
         //Weg mit wenigster Gefahr gehen
 
-<<<<<<< HEAD
 
-=======
-        fileHelper.log("test log");
->>>>>>> 967292b3d45c913974c2b74f4f43f6dcb3c279e6
     }
 
 }
