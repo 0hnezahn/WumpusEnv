@@ -10,7 +10,6 @@ package main.java.de.legoshi.javabot;
 1. Eckige Klammern aus String entfernen
 2. In Array nach String suchen
 3. Decision-Funktion bauen und Returnwert setzen (up, down, left, oder right) + Zufälligkeitsfunktion
-4. Alle Zuweisungen zu "command" müssen Strings sein nach Readme Vorlage
 */
 
 
