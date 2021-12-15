@@ -10,6 +10,7 @@ package main.java.de.legoshi.javabot;
 1. Eckige Klammern aus String entfernen
 2. In Array nach String suchen
 3. Decision-Funktion bauen und Returnwert setzen (up, down, left, oder right) + Zufälligkeitsfunktion
+4. Alle Zuweisungen zu "command" müssen Strings sein nach Readme Vorlage
 */
 
 
@@ -25,8 +26,12 @@ public class Bot {
     //statearray[1] = "[START,PLAYER]"
     public String[] statearray = gameState.split(";");
     public String command;
+
+    //Width und Height werden beim execute gesetzt
     public int width;
     public int height;
+
+
     public String up = "B;UP;false;false;false";
     public String down = "B;DOWN;false;false;false";
     public String left = "B;LEFT;false;false;false";
@@ -67,22 +72,16 @@ public class Bot {
     public String decision(int x, int y) {
 
 
-    	if(prob[(width/2)-1+x+1][(width/2)-1+y] < prob[(width/2)-1+x-1][(width/2)-1+y]) {
 
-    	}
 
-    	if(prob[(width/2)-1+x][(width/2)-1+y+1] < prob[(width/2)-1+x][(width/2)-1+y-1]) {
-
-    	}
-
-        return null;
+        return null; //Ersetzen
     }
 
     public void execute() {
 
-
-    	int x = 0;
-    	int y = 0;
+      if(s0 == 0)
+    	int x = width/2;
+    	int y = height/2;
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
     		if(statearray[1].equals("GOLD") && x == 0 && y == 0) {
 
