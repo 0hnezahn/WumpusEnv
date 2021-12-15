@@ -10,6 +10,7 @@ package main.java.de.legoshi.javabot;
 1. Eckige Klammern aus String entfernen
 2. In Array nach String suchen
 3. Decision-Funktion bauen und Returnwert setzen (up, down, left, oder right) + Zufälligkeitsfunktion
+4. Grenzenerkennung (bumpfunktion) mit gegenüberliegender Wand
 */
 
 
@@ -24,6 +25,7 @@ public class Bot {
     public String gameState;
     //statearray[1] = "[START,PLAYER]"
     public String[] statearray = gameState.split(";");
+    //Botanweisungen werden aus command gezogen
     public String command;
 
     //Width und Height werden beim execute gesetzt
@@ -38,8 +40,12 @@ public class Bot {
     public String scream = "B;NOTHING;true;false;false";
     public String pickup = "B;NOTHING;false;true;false";
     public String climb = "B;NOTHING;false;false;true";
-    public boolean [][] visited = new boolean [width-1][height-1];
-    public int [][] prob = new int [width-1][height-1];
+
+
+
+
+    //Initialisierungsvariable
+    public int s0 = 0;
 
 
     /*The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]". --> Was ist gemeint?*/
@@ -48,20 +54,27 @@ public class Bot {
         this.fileHelper = fileHelper;
     }
 
+
+    public void constructField(){
+        public boolean [][] visited = new boolean [width*2][height*2];
+        public int [][] prob = new int [width*2][height*2];
+    }
+
+
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
     public void danger(int x, int y) {
-    	if(visited[(width/2)-1+x+1][(width/2)-1+y] == false) {
-    		prob[(width/2)-1+x+1][(width/2)-1+y] += 1;
+    	if(visited[width+x+1][height+y] == false) {
+    		prob[width+x+1][height+y] += 1;
     	}
-    	if(visited[(width/2)-1+x-1][(width/2)-1+y] == false) {
-    		prob[(width/2)-1+x-1][(width/2)-1+y] += 1;
+    	if(visited[width+x-1][height+y] == false) {
+    		prob[width+x-1][height+y] += 1;
     	}
-    	if(visited[(width/2)-1+x][(width/2)-1+y+1] == false) {
-    		prob[(width/2)-1+x][(width/2)-1+y+1] += 1;
+    	if(visited[width+x][height+y+1] == false) {
+    		prob[width+x][height+y+1] += 1;
     	}
-    	if(visited[(width/2)-1+x][(width/2)-1+y-1] == false) {
-    		prob[(width/2)-1+x][(width/2)-1+y-1] += 1;
+    	if(visited[width+x][height+y-1] == false) {
+    		prob[width+x][height+y-1] += 1;
     	}
 
     }
@@ -69,20 +82,45 @@ public class Bot {
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
     public String decision(int x, int y) {
-
-
-
-
-        return null; //Ersetzen
+      int a, b, c, d = 100;
+      if(visited[width+x+1][height+y] == false) {
+    		a = prob[width+x+1][height+y];
+    	}
+    	if(visited[width+x-1][height+y] == false) {
+    		b = prob[width+x-1][height+y];
+    	}
+    	if(visited[width+x][height+y+1] == false) {
+    		c = prob[width+x][height+y+1];
+    	}
+    	if(visited[width+x][height+y-1] == false) {
+    		d = prob[width+x][height+y-1];
+    	}
+      e = Math.min(a, b, c, d);
+      if(a == e){
+        return "right";
+      }
+      if(b == e){
+        return "left";
+      }
+      if(c == e){
+        return "up"
+      }
+      if(d == e){
+        return "down"
+      }
+      fileHelper.log("Fehler beim Decisionmaking");
+      return null; //Ersetzen
     }
 
     public void execute() {
 
-      if(s0 == 0)
-    	int x = width/2;
-    	int y = height/2;
+      if(s0 == 0){
+          constructField();
+          s0 += 1;
+      }
+
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-    		if(statearray[1].equals("GOLD") && x == 0 && y == 0) {
+    		if(statearray[1].equals("GOLD") && x == x0 && y == y0) {
 
     			command = climb;
         //Wenn Wind -> Felder mit Gefahr markieren
@@ -102,8 +140,6 @@ public class Bot {
         //Weg mit wenigster Gefahr gehen
 
 
-        command = "B;UP;false;false;false";
-        fileHelper.log("test log");
     }
 
 }
