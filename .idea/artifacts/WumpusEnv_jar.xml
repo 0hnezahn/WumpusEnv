@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="WumpusEnv:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/WumpusEnv_jar</output-path>
+    <output-path>$PROJECT_DIR$/complete</output-path>
     <root id="archive" name="WumpusEnv.jar">
       <element id="module-output" name="WumpusEnv" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/16/javafx-base-16-win.jar" path-in-jar="/" />

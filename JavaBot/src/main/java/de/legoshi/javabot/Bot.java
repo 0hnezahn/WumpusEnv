@@ -19,22 +19,22 @@ import java.util.Arrays;
 
 public class Bot {
 
-
-
-
     private FileHelper fileHelper;
     //gameState = "C;[self];[x,y];hasgold;escaped;alive" = C;[START,PLAYER];[0.0,0.0];false;false;true
     public String gameState;
     //gamearray[1] = "[START,PLAYER]"
-    public String[] gamearray = gameState.split(";");
+    public String[] gamearray;
     public String command;
 
-    public String statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
-    public String[] statearray = statestring.split(",");
+    public String statestring;
+    public String[] statearray;
 
     //Width und Height werden beim execute gesetzt
     public int width;
     public int height;
+
+    public boolean[][] visited;
+    public int[][] prob;
 
 
     public String up = "B;UP;false;false;false";
@@ -44,8 +44,6 @@ public class Bot {
     public String scream = "B;NOTHING;true;false;false";
     public String pickup = "B;NOTHING;false;true;false";
     public String climb = "B;NOTHING;false;false;true";
-
-
 
 
     //Initialisierungsvariable
@@ -59,88 +57,102 @@ public class Bot {
     }
 
 
-    public void constructField(){
-        public boolean [][] visited = new boolean [width*2][height*2];
-        public int [][] prob = new int [width*2][height*2];
+    public void constructField() {
+        this.visited = new boolean[width * 2][height * 2];
+        this.prob = new int[width * 2][height * 2];
+        this.gamearray = gameState.split(";");
+        this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+        this.statearray = statestring.split(",");
     }
 
 
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
     public void danger(int x, int y) {
-    	if(visited[width+x+1][height+y] == false) {
-    		prob[width+x+1][height+y] += 1;
-    	}
-    	if(visited[width+x-1][height+y] == false) {
-    		prob[width+x-1][height+y] += 1;
-    	}
-    	if(visited[width+x][height+y+1] == false) {
-    		prob[width+x][height+y+1] += 1;
-    	}
-    	if(visited[width+x][height+y-1] == false) {
-    		prob[width+x][height+y-1] += 1;
-    	}
+        if (!visited[width + x + 1][height + y]) {
+            prob[width + x + 1][height + y] += 1;
+        }
+        if (!visited[width + x - 1][height + y]) {
+            prob[width + x - 1][height + y] += 1;
+        }
+        if (!visited[width + x][height + y + 1]) {
+            prob[width + x][height + y + 1] += 1;
+        }
+        if (!visited[width + x][height + y - 1]) {
+            prob[width + x][height + y - 1] += 1;
+        }
 
     }
 
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
     public String decision(int x, int y) {
-      int a, b, c, d = 100;
-      if(visited[width+x+1][height+y] == false) {
-    		a = prob[width+x+1][height+y];
-    	}
-    	if(visited[width+x-1][height+y] == false) {
-    		b = prob[width+x-1][height+y];
-    	}
-    	if(visited[width+x][height+y+1] == false) {
-    		c = prob[width+x][height+y+1];
-    	}
-    	if(visited[width+x][height+y-1] == false) {
-    		d = prob[width+x][height+y-1];
-    	}
-      e = Math.min(a, b, c, d);
-      if(a == e){
-        return "right";
-      }
-      if(b == e){
-        return "left";
-      }
-      if(c == e){
-        return "up"
-      }
-      if(d == e){
-        return "down"
-      }
-      fileHelper.log("Fehler beim Decisionmaking");
-      return null; //Ersetzen
+        int a = 100;
+        int b = 100;
+        int c = 100;
+        int d = 100;
+        if (!visited[width + x + 1][height + y]) {
+            a = prob[width + x + 1][height + y];
+        }
+        if (!visited[width + x - 1][height + y]) {
+            b = prob[width + x - 1][height + y];
+        }
+        if (!visited[width + x][height + y + 1]) {
+            c = prob[width + x][height + y + 1];
+        }
+        if (!visited[width + x][height + y - 1]) {
+            d = prob[width + x][height + y - 1];
+        }
+        int e = getMin(a, b, c, d);
+        if (a == e) {
+            return "right";
+        }
+        if (b == e) {
+            return "left";
+        }
+        if (c == e) {
+            return "up";
+        }
+        if (d == e) {
+            return "down";
+        }
+        fileHelper.log("Fehler beim Decisionmaking");
+        return null; //Ersetzen
+    }
+
+    private int getMin(int a, int b, int c, int d) {
+        return Math.min(a, Math.min(b, Math.min(c, d)));
     }
 
     public void execute() {
 
-      if(s0 == 0){
-          constructField();
-          s0 += 1;
-      }
+        int x, y;
+        x = 10;
+        y = 10;
+
+        if (s0 == 0) {
+            constructField();
+            s0 += 1;
+        }
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-    		if(Arrays.asList(statearray).contains("GOLD")) && x == 0 && y == 0) {
+        if (Arrays.asList(statearray).contains("GOLD") && x == 0 && y == 0){
 
-    			command = climb;
-        //Wenn Wind -> Felder mit Gefahr markieren
-    		} else if(Arrays.asList(statearray).contains("WIND")) {
+            command = climb;
+            //Wenn Wind -> Felder mit Gefahr markieren
+        } else if (Arrays.asList(statearray).contains("WIND")) {
 
-    			danger(x,y);
-        //Wenn Gestank -> Felder mit Gefahr markieren
-    		} else if(Arrays.asList(statearray).contains("STENCH")) {
+            danger(x, y);
+            //Wenn Gestank -> Felder mit Gefahr markieren
+        } else if (Arrays.asList(statearray).contains("STENCH")) {
 
-    			danger(x,y);
-        //Wenn Gold -> Gold aufheben
-    		} else if(Arrays.asList(statearray).contains("GOLD")) {
+            danger(x, y);
+            //Wenn Gold -> Gold aufheben
+        } else if (Arrays.asList(statearray).contains("GOLD")) {
 
-    			command = pickup;
+            command = pickup;
 
-    		}
+        }
         //Weg mit wenigster Gefahr gehen
 
 
