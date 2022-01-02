@@ -9,10 +9,8 @@ import java.util.Arrays;
  */
 
 /* TODO
-1. Eckige Klammern aus String entfernen
-2. In Array nach String suchen
-3. Decision-Funktion bauen und Returnwert setzen (up, down, left, oder right) + Zufälligkeitsfunktion
-4. Grenzenerkennung (bumpfunktion) mit gegenüberliegender Wand
+1. Grenzenerkennung (bumpfunktion) mit gegenüberliegender Wand
+2. X und Y für Position in execute Funktion anpassen
 */
 
 
