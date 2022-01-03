@@ -46,6 +46,8 @@ public class Bot {
 
     //Initialisierungsvariable
     public int s0 = 0;
+    int x; //X Position des Bots
+    int y; //Y Position des Bots
 
 
     /*The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]". --> Was ist gemeint?*/
@@ -103,16 +105,16 @@ public class Bot {
         }
         int e = getMin(a, b, c, d);
         if (a == e) {
-            return "right";
+            return right;
         }
         if (b == e) {
-            return "left";
+            return left;
         }
         if (c == e) {
-            return "up";
+            return up;
         }
         if (d == e) {
-            return "down";
+            return down;
         }
         fileHelper.log("Fehler beim Decisionmaking");
         return null; //Ersetzen
@@ -124,13 +126,11 @@ public class Bot {
 
     public void execute() {
 
-        int x, y;
-        x = 10;
-        y = 10;
-
         if (s0 == 0) {
             constructField();
             s0 += 1;
+            x = 0;
+            y = 0;
         }
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
@@ -141,14 +141,20 @@ public class Bot {
         } else if (Arrays.asList(statearray).contains("WIND")) {
 
             danger(x, y);
+            command = decision(x, y);
             //Wenn Gestank -> Felder mit Gefahr markieren
         } else if (Arrays.asList(statearray).contains("STENCH")) {
 
             danger(x, y);
+            command = decision(x, y);
             //Wenn Gold -> Gold aufheben
         } else if (Arrays.asList(statearray).contains("GOLD")) {
 
             command = pickup;
+
+        } else {
+
+            command = decision(x, y);
 
         }
         //Weg mit wenigster Gefahr gehen
