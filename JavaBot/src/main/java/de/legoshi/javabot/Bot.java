@@ -59,9 +59,6 @@ public class Bot {
     public void constructField() {
         this.visited = new boolean[width * 3][height * 3];
         this.prob = new int[width * 3][height * 3];
-        this.gamearray = gameState.split(";");
-        this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
-        this.statearray = statestring.split(",");
     }
 
 
@@ -145,7 +142,9 @@ public class Bot {
     }
 
     public void execute() {
-
+    	this.gamearray = gameState.split(";");
+        this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+        this.statearray = statestring.split(",");
 
         if (s0 == 0) {
             constructField();
@@ -154,9 +153,6 @@ public class Bot {
             y = 0;
         }else {
             notMoved(command);
-            this.gamearray = gameState.split(";");
-            this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
-            this.statearray = statestring.split(",");
         }
 
         visited[width + x][height + y] = true;
