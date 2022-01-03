@@ -51,17 +51,14 @@ public class Bot {
     int tx = 100; //X in Zeit t-1
     int ty = 100; //Y in Zeit t-1
 
-
-    /*The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]". --> Was ist gemeint?*/
-
     public Bot(FileHelper fileHelper) {
         this.fileHelper = fileHelper;
     }
 
 
     public void constructField() {
-        this.visited = new boolean[width * 2][height * 2];
-        this.prob = new int[width * 2][height * 2];
+        this.visited = new boolean[width * 3][height * 3];
+        this.prob = new int[width * 3][height * 3];
         this.gamearray = gameState.split(";");
         this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
         this.statearray = statestring.split(",");
