@@ -154,6 +154,9 @@ public class Bot {
             y = 0;
         }else {
             notMoved(command);
+            this.gamearray = gameState.split(";");
+            this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+            this.statearray = statestring.split(",");
         }
 
         visited[width + x][height + y] = true;
