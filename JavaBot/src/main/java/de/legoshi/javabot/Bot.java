@@ -48,6 +48,8 @@ public class Bot {
     public int s0 = 0;
     int x; //X Position des Bots
     int y; //Y Position des Bots
+    int tx = 100; //X in Zeit t-1
+    int ty = 100; //Y in Zeit t-1
 
 
     /*The values self, top, bottom, right, left can be repeated such as "["STENCH", "WIND"]". --> Was ist gemeint?*/
@@ -68,52 +70,56 @@ public class Bot {
 
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
-    public void danger(int x, int y) {
-        if (!visited[width + x + 1][height + y]) {
-            prob[width + x + 1][height + y] += 1;
+    public void danger(int fx, int fy) {
+        if (!visited[width + fx + 1][height + fy]) {
+            prob[width + fx + 1][height + fy] += 1;
         }
-        if (!visited[width + x - 1][height + y]) {
-            prob[width + x - 1][height + y] += 1;
+        if (!visited[width + fx - 1][height + fy]) {
+            prob[width + fx - 1][height + fy] += 1;
         }
-        if (!visited[width + x][height + y + 1]) {
-            prob[width + x][height + y + 1] += 1;
+        if (!visited[width + fx][height + fy + 1]) {
+            prob[width + fx][height + fy + 1] += 1;
         }
-        if (!visited[width + x][height + y - 1]) {
-            prob[width + x][height + y - 1] += 1;
+        if (!visited[width + fx][height + fy - 1]) {
+            prob[width + fx][height + fy - 1] += 1;
         }
 
     }
 
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
-    public String decision(int x, int y) {
+    public String decision(int fx, int fy) {
         int a = 100;
         int b = 100;
         int c = 100;
         int d = 100;
-        if (!visited[width + x + 1][height + y]) {
-            a = prob[width + x + 1][height + y];
+        if (!visited[width + fx + 1][height + fy]) {
+            a = prob[width + fx + 1][height + fy];
         }
-        if (!visited[width + x - 1][height + y]) {
-            b = prob[width + x - 1][height + y];
+        if (!visited[width + fx - 1][height + fy]) {
+            b = prob[width + fx - 1][height + fy];
         }
-        if (!visited[width + x][height + y + 1]) {
-            c = prob[width + x][height + y + 1];
+        if (!visited[width + fx][height + fy + 1]) {
+            c = prob[width + fx][height + fy + 1];
         }
-        if (!visited[width + x][height + y - 1]) {
-            d = prob[width + x][height + y - 1];
+        if (!visited[width + fx][height + fy - 1]) {
+            d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
         if (a == e) {
+            x += 1;
             return right;
         }
         if (b == e) {
+            x -= 1;
             return left;
         }
         if (c == e) {
+            y += 1;
             return up;
         }
         if (d == e) {
+            y -= 1;
             return down;
         }
         fileHelper.log("Fehler beim Decisionmaking");
@@ -121,17 +127,39 @@ public class Bot {
     }
 
     private int getMin(int a, int b, int c, int d) {
-        return Math.min(a, Math.min(b, Math.min(c, d)));
+        return Math.min(Math.min(a, b), Math.min(c, d));
+    }
+
+    private void notMoved(String move){
+        if(x == tx && y == ty){
+            if (move.equals(right)) {
+                visited[width + x + 1][height + y] = true;
+            }
+            if (move.equals(left)) {
+                visited[width + x - 1][height + y] = true;
+            }
+            if (move.equals(up)) {
+                visited[width + x][height + y + 1] = true;
+            }
+            if (move.equals(down)) {
+                visited[width + x][height + y - 1] = true;
+            }
+        }
     }
 
     public void execute() {
+
 
         if (s0 == 0) {
             constructField();
             s0 += 1;
             x = 0;
             y = 0;
+        }else {
+            notMoved(command);
         }
+
+        visited[width + x][height + y] = true;
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
         if (Arrays.asList(statearray).contains("GOLD") && x == 0 && y == 0){
@@ -159,6 +187,8 @@ public class Bot {
         }
         //Weg mit wenigster Gefahr gehen
 
+        tx = x;
+        ty = y;
 
     }
 
