@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 /* TODO
 1. Grenzenerkennung (bumpfunktion) mit gegenüberliegender Wand
-2. X und Y für Position in execute Funktion anpassen
+2. Felder als definitiv sicher einstufen 
 */
 
 
