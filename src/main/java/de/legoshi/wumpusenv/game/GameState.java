@@ -225,6 +225,10 @@ public class GameState {
         for (int column = 0; column < getWidth(); column++) {
             for (int row = 0; row < getHeight(); row++) {
                 game[row][column] = new FieldStatus();
+                if(row == 0) game[row][column].getArrayList().add(Status.WALL_TOP);
+                if(row == getHeight()-1) game[row][column].getArrayList().add(Status.WALL_BOTTOM);
+                if(column == 0) game[row][column].getArrayList().add(Status.WALL_LEFT);
+                if(column == getWidth()-1) game[row][column].getArrayList().add(Status.WALL_RIGHT);
             }
         }
     }

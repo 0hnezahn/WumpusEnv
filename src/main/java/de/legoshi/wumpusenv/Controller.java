@@ -9,6 +9,7 @@ import de.legoshi.wumpusenv.utils.FileHelper;
 import de.legoshi.wumpusenv.utils.Simulator;
 import de.legoshi.wumpusenv.utils.Status;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
@@ -18,6 +19,8 @@ import javafx.scene.layout.*;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +62,7 @@ public class Controller implements Initializable {
     public Button customSpawnButton;
     public Label messageLabel;
     public Label egg;
+    public TextField periodField;
 
     private GameState gameState;
     public Button[][] buttons;
@@ -71,6 +75,9 @@ public class Controller implements Initializable {
     private boolean visible = true;
     private boolean custom = false;
     private boolean spawn = false;
+
+    private boolean restart = false;
+    private int period = 2000;
 
     private int columnF = 7;
     private int rowF = 7;
@@ -160,6 +167,15 @@ public class Controller implements Initializable {
 
         this.step = new AtomicInteger(0);
         simulator.sendPlayerStates();
+
+        startRunnable();
+
+        reloadBoard();
+        FileHelper.writeToLog("Successfully started the simulation");
+        messageLabel.setText("Successfully started the simulation");
+    }
+
+    private void startRunnable() {
         this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             if (!paused) {
@@ -190,12 +206,18 @@ public class Controller implements Initializable {
                     simulator.sendPlayerStates();
                     Platform.runLater(this::reloadBoard);
                     Platform.runLater(() -> stepLabel.setText("Step: " + step.get()));
+
+                    if (restart) {
+                        try {
+                            restart = false;
+                            period = Integer.parseInt(periodField.getText());
+                            scheduledExecutorService.shutdown();
+                            startRunnable();
+                        } catch (NumberFormatException ignored) { }
+                    }
                 }
             }
-        }, 100, 2000, TimeUnit.MILLISECONDS);
-        reloadBoard();
-        FileHelper.writeToLog("Successfully started the simulation");
-        messageLabel.setText("Successfully started the simulation");
+        }, 100, period, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -215,7 +237,7 @@ public class Controller implements Initializable {
             return;
         }
 
-        if(!new File(bName).exists()) {
+        if (!new File(bName).exists()) {
             FileHelper.writeToLog("Bot is doesnt exist");
             messageLabel.setText("Bot is doesnt exist");
             return;
@@ -278,7 +300,7 @@ public class Controller implements Initializable {
         gameState.getPlayers().removeIf(all -> all.getId().equals(botName));
         removeBotCB.getItems().remove(botName);
 
-        if(gameState.getPlayers().size() == 0) {
+        if (gameState.getPlayers().size() == 0) {
             removeBot.setDisable(true);
             removeBotCB.setDisable(true);
         }
@@ -335,7 +357,7 @@ public class Controller implements Initializable {
         gameState.getWumpuses().clear();
 
         overwriteButtons();
-        overwriteState();
+        gameState.initState();
 
         stepLabel.setText("Step: 0");
         removeBotCB.getItems().clear();
@@ -413,7 +435,7 @@ public class Controller implements Initializable {
                 return;
             } else {
                 gameState.addGold(y, x);
-                gameState.getWumpuses().add(new Wumpus(new Point2D(x,y)));
+                gameState.getWumpuses().add(new Wumpus(new Point2D(x, y)));
             }
         }
         reloadBoard();
@@ -482,7 +504,7 @@ public class Controller implements Initializable {
             return;
         }
 
-        if(gameState.getGame()[y][x].getArrayList().contains(Status.WUMPUS) ||
+        if (gameState.getGame()[y][x].getArrayList().contains(Status.WUMPUS) ||
                 gameState.getGame()[y][x].getArrayList().contains(Status.START) ||
                 gameState.getGame()[y][x].getArrayList().contains(Status.HOLE)) {
             FileHelper.writeToLog("Field already occupied");
@@ -555,14 +577,6 @@ public class Controller implements Initializable {
         return (x >= 0 && x < columnF && y >= 0 && y < rowF);
     }
 
-    private void overwriteState() {
-        for (int row = 0; row < rowF; row++) {
-            for (int column = 0; column < columnF; column++) {
-                gameState.getGame()[row][column] = new FieldStatus();
-            }
-        }
-    }
-
     private Player getPlayer(String playerID) {
         for (Player all : gameState.getPlayers()) {
             if (all.getId().equals(playerID)) {
@@ -585,7 +599,11 @@ public class Controller implements Initializable {
     }
 
     public void egg() {
-        if(egg.getText().equals("sponsored by raid shadow legends")) egg.setText("");
+        if (egg.getText().equals("sponsored by raid shadow legends")) egg.setText("");
         else egg.setText("sponsored by raid shadow legends");
+    }
+
+    public void updatePeriod() {
+        restart = true;
     }
 }

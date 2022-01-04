@@ -14,6 +14,10 @@ public enum Status implements Serializable {
     HOLE,
     WUMPUS,
     PLAYER,
-    START;
+    START,
+    WALL_TOP,
+    WALL_BOTTOM,
+    WALL_LEFT,
+    WALL_RIGHT;
 
 }

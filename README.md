@@ -13,7 +13,14 @@ The environment developed in java will simulate one walkthrough in our partially
 + pit: kills agent
 + breeze: in von Neumann neighborhood to pit
 + stench: in von Neumann neighborhood to wumpus
-+ vector: pointing from one agents position to the scream location
++ vector: pointing from one agents position to the scream location  
+
+Following further states are required to ensure that the bot knows in what direction a wall is. Otherwise it would be 
+undetectable if a bot is actually moving or if he is just running against a wall:
++ wall up
++ wall down
++ wall left
++ wall right
 
 ### 2.3 Requirements
 + Rectangle: minimal size: |players|+2 for hight or width, the other side being at least |players| 
@@ -102,7 +109,7 @@ Notice that you can only set one interaction at once. If you put in or enable mo
 
 ##### 5.4.3 Message format for status of field:  
 "C;[self];[x,y];hasgold;escaped;alive" with:  
-- self: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD"
+- self: "STENCH", "WIND", "HOLE", "WUMPUS", "START", "PLAYER", "GOLD", "WALL_TOP", "WALL_BOTTOM", "WALL_LEFT", "WALL_RIGHT"
 - x, y: Double
 - hasgold: "true", "false"
 - escaped: "true", "false"
