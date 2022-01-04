@@ -100,6 +100,7 @@ public class Bot {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
+
         if (a == e) {
             x += 1;
             return right;
@@ -186,6 +187,8 @@ public class Bot {
         tx = x;
         ty = y;
 
+        fileHelper.log("X = " + x);
+        fileHelper.log("Y = " + y);
     }
 
 }
