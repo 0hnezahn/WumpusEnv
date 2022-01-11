@@ -118,11 +118,11 @@ public class Bot {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
-        fileHelper.log(a);
-        fileHelper.log(b);
-        fileHelper.log(c);
-        fileHelper.log(d);
-        fileHelper.log(e);
+        fileHelper.log("a = " +a);
+        fileHelper.log("b = " +b);
+        fileHelper.log("c = " +c);
+        fileHelper.log("d = " +d);
+        fileHelper.log("e = " +e);
         if (visited[width + fx + 1][height + fy]>=3){
           visited[width + fx + 1][height + fy] = 0;
         }
