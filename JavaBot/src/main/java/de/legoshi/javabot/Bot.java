@@ -35,7 +35,7 @@ public class Bot {
     public int height;
 
     //Felder für die Erkennung
-    public boolean[][] visited;
+    public int[][] visited;
     public int[][] prob;
     public boolean[][] safe;
 
@@ -66,7 +66,7 @@ public class Bot {
 
 
     public void constructField() {
-        this.visited = new boolean[width * 3][height * 3];
+        this.visited = new int[width * 3][height * 3];
         this.prob = new int[width * 3][height * 3];
         this.safe = new boolean[width * 3][height * 3];
     }
@@ -75,16 +75,16 @@ public class Bot {
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
     public void danger(int fx, int fy) {
-        if (!visited[width + fx + 1][height + fy]) {
+        if (!safe[width + fx + 1][height + fy]) {
             prob[width + fx + 1][height + fy] += 1;
         }
-        if (!visited[width + fx - 1][height + fy]) {
+        if (!safe[width + fx - 1][height + fy]) {
             prob[width + fx - 1][height + fy] += 1;
         }
-        if (!visited[width + fx][height + fy + 1]) {
+        if (!safe[width + fx][height + fy + 1]) {
             prob[width + fx][height + fy + 1] += 1;
         }
-        if (!visited[width + fx][height + fy - 1]) {
+        if (!safe[width + fx][height + fy - 1]) {
             prob[width + fx][height + fy - 1] += 1;
         }
 
@@ -105,16 +105,16 @@ public class Bot {
         int b = 100; //links
         int c = 100; //oben
         int d = 100; //unten
-        if (safe[width + fx + 1][height + fy] && wall_right != fx) {
+        if (visited[width + fx + 1][height + fy]<4 && safe[width + fx + 1][height + fy] && wall_right != fx) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (safe[width + fx - 1][height + fy] && wall_left != fx) {
+        if (visited[width + fx - 1][height + fy]<4 && safe[width + fx - 1][height + fy] && wall_left != fx) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (safe[width + fx][height + fy + 1] && wall_top != fy) {
+        if (visited[width + fx][height + fy + 1]<4 && safe[width + fx][height + fy + 1] && wall_top != fy) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (safe[width + fx][height + fy - 1] && wall_bottom != fy) {
+        if (visited[width + fx][height + fy - 1]<4 && safe[width + fx][height + fy - 1] && wall_bottom != fy) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -143,23 +143,6 @@ public class Bot {
         return Math.min(Math.min(a, b), Math.min(c, d));
     }
 
-    private void notMoved(String move){
-        if(x == tx && y == ty){
-            if (move.equals(right)) {
-                visited[width + x + 1][height + y] = true;
-            }
-            if (move.equals(left)) {
-                visited[width + x - 1][height + y] = true;
-            }
-            if (move.equals(up)) {
-                visited[width + x][height + y + 1] = true;
-            }
-            if (move.equals(down)) {
-                visited[width + x][height + y - 1] = true;
-            }
-        }
-    }
-
     public void execute() {
     	this.gamearray = gameState.split(";");
         this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
@@ -170,11 +153,9 @@ public class Bot {
             s0 += 1;
             x = 0;
             y = 0;
-        }else {
-            notMoved(command);
         }
 
-        visited[width + x][height + y] = true;
+        visited[width + x][height + y] += 1;
 
         if (Arrays.asList(statearray).contains("WALL_TOP")){
             wall_top = y;
