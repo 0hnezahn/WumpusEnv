@@ -14,6 +14,7 @@ import java.util.Arrays;
 3. Notschalter -> Wenn Gestank dann 2 oder 3 Felder weglaufen und als gefährliches Gebiet einstufen
 -> Wenn Gold schnell nach Hause
 bei beidem Löcher umgehen
+4. string in einem array finden
 */
 
 
