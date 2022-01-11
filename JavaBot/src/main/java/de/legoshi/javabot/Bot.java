@@ -105,16 +105,16 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && Arrays.asList(this.stateArray).contains("WALL_RIGHT") == false) {
+        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && !Arrays.asList(this.stateArray).contains("WALL_RIGHT")) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && Arrays.asList(this.stateArray).contains("WALL_LEFT") == false) {
+        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && !Arrays.asList(this.stateArray).contains("WALL_LEFT")) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && Arrays.asList(this.stateArray).contains("WALL_TOP") == false) {
+        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && !Arrays.asList(this.stateArray).contains("WALL_TOP")) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && Arrays.asList(this.stateArray).contains("WALL_BOTTOM") == false) {
+        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && !Arrays.asList(this.stateArray).contains("WALL_BOTTOM")) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -205,6 +205,8 @@ public class Bot {
 
         fileHelper.log("X = " + x);
         fileHelper.log("Y = " + y);
+
+        fileHelper.log(Arrays.toString(stateArray));
     }
 
 }
