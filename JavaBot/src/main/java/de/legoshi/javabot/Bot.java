@@ -101,23 +101,40 @@ public class Bot {
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
     public String decision(int fx, int fy) {
-        int a = 100; //rechts
-        int b = 100; //links
-        int c = 100; //oben
-        int d = 100; //unten
-        if (visited[width + fx + 1][height + fy]<4 && safe[width + fx + 1][height + fy] && wall_right != fx) {
+        int a = 1000; //rechts
+        int b = 1000; //links
+        int c = 1000; //oben
+        int d = 1000; //unten
+        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && Arrays.asList(statearray).contains("WALL_RIGHT") == false) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<4 && safe[width + fx - 1][height + fy] && wall_left != fx) {
+        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && Arrays.asList(statearray).contains("WALL_LEFT") == false) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<4 && safe[width + fx][height + fy + 1] && wall_top != fy) {
+        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && Arrays.asList(statearray).contains("WALL_TOP") == false) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<4 && safe[width + fx][height + fy - 1] && wall_bottom != fy) {
+        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && Arrays.asList(statearray).contains("WALL_BOTTOM") == false) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
+        fileHelper.log(a);
+        fileHelper.log(b);
+        fileHelper.log(c);
+        fileHelper.log(d);
+        fileHelper.log(e);
+        if (visited[width + fx + 1][height + fy]>=3){
+          visited[width + fx + 1][height + fy] = 0;
+        }
+        if (visited[width + fx - 1][height + fy]>=3){
+          visited[width + fx - 1][height + fy] = 0;
+        }
+        if (visited[width + fx][height + fy + 1]>=3){
+          visited[width + fx][height + fy + 1] = 0;
+        }
+        if (visited[width + fx][height + fy - 1]>=3){
+          visited[width + fx][height + fy - 1] = 0;
+        }
 
         if (a == e) {
             x += 1;
@@ -156,22 +173,6 @@ public class Bot {
         }
 
         visited[width + x][height + y] += 1;
-
-        if (Arrays.asList(statearray).contains("WALL_TOP")){
-            wall_top = y;
-        }
-
-        if (Arrays.asList(statearray).contains("WALL_BOTTOM")){
-            wall_bottom = y;
-        }
-
-        if (Arrays.asList(statearray).contains("WALL_LEFT")){
-            wall_left = x;
-        }
-
-        if (Arrays.asList(statearray).contains("WALL_RIGHT")){
-            wall_right = x;
-        }
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
         if (Arrays.asList(statearray).contains("GOLD") && x == 0 && y == 0){
