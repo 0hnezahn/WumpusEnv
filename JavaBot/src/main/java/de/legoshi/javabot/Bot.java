@@ -34,9 +34,10 @@ public class Bot {
     public int width;
     public int height;
 
+    //Felder für die Erkennung
     public boolean[][] visited;
     public int[][] prob;
-
+    public boolean[][] safe;
 
     public String up = "B;UP;false;false;false";
     public String down = "B;DOWN;false;false;false";
@@ -54,6 +55,11 @@ public class Bot {
     int tx = 100; //X in Zeit t-1
     int ty = 100; //Y in Zeit t-1
 
+    int wall_top;
+    int wall_bottom;
+    int wall_left;
+    int wall_right;
+
     public Bot(FileHelper fileHelper) {
         this.fileHelper = fileHelper;
     }
@@ -62,6 +68,7 @@ public class Bot {
     public void constructField() {
         this.visited = new boolean[width * 3][height * 3];
         this.prob = new int[width * 3][height * 3];
+        this.safe = new boolean[width * 3][height * 3];
     }
 
 
@@ -83,23 +90,31 @@ public class Bot {
 
     }
 
+    public void marksafe(int fx, int fy) {
+      safe[width + fx][height + fy - 1] = true;
+      safe[width + fx][height + fy + 1] = true;
+      safe[width + fx - 1][height + fy] = true;
+      safe[width + fx + 1][height + fy] = true;
+      safe[width + fx][height + fy] = true;
+    }
+
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
     public String decision(int fx, int fy) {
-        int a = 100;
-        int b = 100;
-        int c = 100;
-        int d = 100;
-        if (!visited[width + fx + 1][height + fy]) {
+        int a = 100; //rechts
+        int b = 100; //links
+        int c = 100; //oben
+        int d = 100; //unten
+        if (safe[width + fx + 1][height + fy] && wall_right != fx) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (!visited[width + fx - 1][height + fy]) {
+        if (safe[width + fx - 1][height + fy] && wall_left != fx) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (!visited[width + fx][height + fy + 1]) {
+        if (safe[width + fx][height + fy + 1] && wall_top != fy) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (!visited[width + fx][height + fy - 1]) {
+        if (safe[width + fx][height + fy - 1] && wall_bottom != fy) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -161,6 +176,22 @@ public class Bot {
 
         visited[width + x][height + y] = true;
 
+        if (Arrays.asList(statearray).contains("WALL_TOP")){
+            wall_top = y;
+        }
+
+        if (Arrays.asList(statearray).contains("WALL_BOTTOM")){
+            wall_bottom = y;
+        }
+
+        if (Arrays.asList(statearray).contains("WALL_LEFT")){
+            wall_left = x;
+        }
+
+        if (Arrays.asList(statearray).contains("WALL_RIGHT")){
+            wall_right = x;
+        }
+
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
         if (Arrays.asList(statearray).contains("GOLD") && x == 0 && y == 0){
 
@@ -181,7 +212,7 @@ public class Bot {
             command = pickup;
 
         } else {
-
+            marksafe(x, y);
             command = decision(x, y);
 
         }
