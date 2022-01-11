@@ -23,12 +23,12 @@ public class Bot {
     private FileHelper fileHelper;
     //gameState = "C;[self];[x,y];hasgold;escaped;alive" = C;[START,PLAYER];[0.0,0.0];false;false;true
     public String gameState;
-    //gamearray[1] = "[START,PLAYER]"
-    public String[] gamearray;
+    //gameArray[1] = "[START,PLAYER]"
+    public String[] gameArray;
     public String command;
 
-    public String statestring;
-    public String[] statearray;
+    public String stateString;
+    public String[] stateArray;
 
     //Width und Height werden beim execute gesetzt
     public int width;
@@ -105,16 +105,16 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && Arrays.asList(statearray).contains("WALL_RIGHT") == false) {
+        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && Arrays.asList(this.stateArray).contains("WALL_RIGHT") == false) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && Arrays.asList(statearray).contains("WALL_LEFT") == false) {
+        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && Arrays.asList(this.stateArray).contains("WALL_LEFT") == false) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && Arrays.asList(statearray).contains("WALL_TOP") == false) {
+        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && Arrays.asList(this.stateArray).contains("WALL_TOP") == false) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && Arrays.asList(statearray).contains("WALL_BOTTOM") == false) {
+        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && Arrays.asList(this.stateArray).contains("WALL_BOTTOM") == false) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -161,9 +161,9 @@ public class Bot {
     }
 
     public void execute() {
-    	this.gamearray = gameState.split(";");
-        this.statestring = gamearray[1].replaceAll("\\[", "").replaceAll("\\]", "");
-        this.statearray = statestring.split(",");
+    	  this.gameArray = gameState.split(";");
+        this.stateString = gameArray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+        this.stateArray = stateString.split(",");
 
         if (s0 == 0) {
             constructField();
@@ -175,21 +175,21 @@ public class Bot {
         visited[width + x][height + y] += 1;
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-        if (Arrays.asList(statearray).contains("GOLD") && x == 0 && y == 0){
+        if (Arrays.asList(stateArray).contains("GOLD") && x == 0 && y == 0){
 
             command = climb;
             //Wenn Wind -> Felder mit Gefahr markieren
-        } else if (Arrays.asList(statearray).contains("WIND")) {
+        } else if (Arrays.asList(stateArray).contains("WIND")) {
 
             danger(x, y);
             command = decision(x, y);
             //Wenn Gestank -> Felder mit Gefahr markieren
-        } else if (Arrays.asList(statearray).contains("STENCH")) {
+        } else if (Arrays.asList(stateArray).contains("STENCH")) {
 
             danger(x, y);
             command = decision(x, y);
             //Wenn Gold -> Gold aufheben
-        } else if (Arrays.asList(statearray).contains("GOLD")) {
+        } else if (Arrays.asList(stateArray).contains("GOLD")) {
 
             command = pickup;
 
