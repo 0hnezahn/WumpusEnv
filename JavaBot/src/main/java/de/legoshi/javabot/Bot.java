@@ -107,7 +107,7 @@ public class Bot {
       safe[width + fx][height + fy] = true;
     }
 
-    private String flee(int fx, int fy){
+    public String flee(int fx, int fy){
       int a = 1000; //rechts
       int b = 1000; //links
       int c = 1000; //oben
@@ -176,7 +176,8 @@ public class Bot {
         fileHelper.log("c = " +c);
         fileHelper.log("d = " +d);
         fileHelper.log("e = " +e);
-        /*if (visited[width + fx + 1][height + fy]>=3){
+        /*
+        if (visited[width + fx + 1][height + fy]>=3){
           visited[width + fx + 1][height + fy] = 0;
         }
         if (visited[width + fx - 1][height + fy]>=3){
@@ -187,7 +188,8 @@ public class Bot {
         }
         if (visited[width + fx][height + fy - 1]>=3){
           visited[width + fx][height + fy - 1] = 0;
-        }*/
+        }
+        */
 
         if (a == e) {
             x += 1;
