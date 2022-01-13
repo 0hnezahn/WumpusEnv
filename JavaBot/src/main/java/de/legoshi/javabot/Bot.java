@@ -158,16 +158,16 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
+        if (visited[width + fx + 1][height + fy]<2 && safe[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
+        if (visited[width + fx - 1][height + fy]<2 && safe[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
+        if (visited[width + fx][height + fy + 1]<2 && safe[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
+        if (visited[width + fx][height + fy - 1]<2 && safe[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -176,7 +176,7 @@ public class Bot {
         fileHelper.log("c = " +c);
         fileHelper.log("d = " +d);
         fileHelper.log("e = " +e);
-        if (visited[width + fx + 1][height + fy]>=3){
+        /*if (visited[width + fx + 1][height + fy]>=3){
           visited[width + fx + 1][height + fy] = 0;
         }
         if (visited[width + fx - 1][height + fy]>=3){
@@ -187,7 +187,7 @@ public class Bot {
         }
         if (visited[width + fx][height + fy - 1]>=3){
           visited[width + fx][height + fy - 1] = 0;
-        }
+        }*/
 
         if (a == e) {
             x += 1;
