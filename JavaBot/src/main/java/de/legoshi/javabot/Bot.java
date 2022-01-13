@@ -9,12 +9,9 @@ import java.util.Arrays;
  */
 
 /* TODO
-1. bump von Benni erkennen und Wände markieren
-2. Felder als definitiv sicher einstufen -> Feld aufbauen mit eindeutig sicheren Feldern die noch nicht besucht wurden
-3. Notschalter -> Wenn Gestank dann 2 oder 3 Felder weglaufen und als gefährliches Gebiet einstufen
--> Wenn Gold schnell nach Hause
-bei beidem Löcher umgehen
-4. string in einem array finden
+1. Ecken-Problem
+2. Wanderkennung bei flee
+3. Wenn Gold schnell nach Hause, bei beidem Löcher umgehen
 */
 
 
