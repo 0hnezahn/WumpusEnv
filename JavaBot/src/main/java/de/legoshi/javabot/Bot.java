@@ -35,6 +35,10 @@ public class Bot {
     public int width;
     public int height;
 
+    //Fliehend
+    public String runFromWumpus;
+    public int fleeing = 0;
+
     //Felder für die Erkennung
     public int[][] visited;
     public int[][] prob;
@@ -56,11 +60,6 @@ public class Bot {
     int tx = 100; //X in Zeit t-1
     int ty = 100; //Y in Zeit t-1
 
-    int wall_top;
-    int wall_bottom;
-    int wall_left;
-    int wall_right;
-
     public Bot(FileHelper fileHelper) {
         this.fileHelper = fileHelper;
     }
@@ -76,8 +75,10 @@ public class Bot {
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
     public boolean arraycontains(String s){
-      for(s : stateArray){
-        return true;
+      for(int i=0; i < stateArray.length; i++){
+        if(stateArray[i].equals(s)){
+          return true;
+        }
       }
       return false;
     }
@@ -107,20 +108,20 @@ public class Bot {
     }
 
     private String flee(int fx, int fy){
-      nt a = 1000; //rechts
+      int a = 1000; //rechts
       int b = 1000; //links
       int c = 1000; //oben
       int d = 1000; //unten
-      if (visited[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
+      if (visited[width + fx + 1][height + fy]>0 && !arraycontains("WALL_RIGHT")) {
           a = prob[width + fx + 1][height + fy];
       }
-      if (visited[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
+      if (visited[width + fx - 1][height + fy]>0 && !arraycontains("WALL_LEFT")) {
           b = prob[width + fx - 1][height + fy];
       }
-      if (visited[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
+      if (visited[width + fx][height + fy + 1]>0 && !arraycontains("WALL_TOP")) {
           c = prob[width + fx][height + fy + 1];
       }
-      if (visited[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
+      if (visited[width + fx][height + fy - 1]>0 && !arraycontains("WALL_BOTTOM")) {
           d = prob[width + fx][height + fy - 1];
       }
       int e = getMin(a, b, c, d);
@@ -225,7 +226,13 @@ public class Bot {
         }
 
         visited[width + x][height + y] += 1;
-
+        if ( fleeing <= 3 && fleeing > 0){
+          command = runFromWumpus;
+          fleeing += 1;
+        }
+        if ( fleeing > 3 ){
+          fleeing = 0;
+        }
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
         if (arraycontains("GOLD") && x == 0 && y == 0){
 
@@ -238,8 +245,10 @@ public class Bot {
             //Wenn Gestank -> Felder mit Gefahr markieren
         } else if (arraycontains("STENCH")) {
 
-            dange(x, y);
+            danger(x, y);
             command = flee(x, y);
+            runFromWumpus = command;
+            fleeing = 1;
             //Wenn Gold -> Gold aufheben
         } else if (arraycontains("GOLD")) {
 
