@@ -75,6 +75,13 @@ public class Bot {
 
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
+    public boolean arraycontains(String s){
+      for(s : stateArray){
+        return true;
+      }
+      return false;
+    }
+
     public void danger(int fx, int fy) {
         if (!safe[width + fx + 1][height + fy]) {
             prob[width + fx + 1][height + fy] += 1;
@@ -99,6 +106,50 @@ public class Bot {
       safe[width + fx][height + fy] = true;
     }
 
+    private String flee(int fx, int fy){
+      nt a = 1000; //rechts
+      int b = 1000; //links
+      int c = 1000; //oben
+      int d = 1000; //unten
+      if (visited[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
+          a = prob[width + fx + 1][height + fy];
+      }
+      if (visited[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
+          b = prob[width + fx - 1][height + fy];
+      }
+      if (visited[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
+          c = prob[width + fx][height + fy + 1];
+      }
+      if (visited[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
+          d = prob[width + fx][height + fy - 1];
+      }
+      int e = getMin(a, b, c, d);
+      fileHelper.log("a = " +a);
+      fileHelper.log("b = " +b);
+      fileHelper.log("c = " +c);
+      fileHelper.log("d = " +d);
+      fileHelper.log("e = " +e);
+
+      if (a == e) {
+          x += 1;
+          return right;
+      }
+      if (b == e) {
+          x -= 1;
+          return left;
+      }
+      if (c == e) {
+          y += 1;
+          return up;
+      }
+      if (d == e) {
+          y -= 1;
+          return down;
+      }
+      fileHelper.log("Fehler beim Decisionmaking");
+      return null; //Ersetzen
+    }
+
 //Decisionfunktion: Entscheidet sich für das Feld mit der niedrigsten Gefährlichkeit
 
     public String decision(int fx, int fy) {
@@ -106,16 +157,16 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && !Arrays.asList(this.stateArray).contains("WALL_RIGHT")) {
+        if (visited[width + fx + 1][height + fy]<3 && safe[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && !Arrays.asList(this.stateArray).contains("WALL_LEFT")) {
+        if (visited[width + fx - 1][height + fy]<3 && safe[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && !Arrays.asList(this.stateArray).contains("WALL_TOP")) {
+        if (visited[width + fx][height + fy + 1]<3 && safe[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && !Arrays.asList(this.stateArray).contains("WALL_BOTTOM")) {
+        if (visited[width + fx][height + fy - 1]<3 && safe[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
             d = prob[width + fx][height + fy - 1];
         }
         int e = getMin(a, b, c, d);
@@ -176,21 +227,21 @@ public class Bot {
         visited[width + x][height + y] += 1;
 
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
-        if (Arrays.asList(stateArray).contains("GOLD") && x == 0 && y == 0){
+        if (arraycontains("GOLD") && x == 0 && y == 0){
 
             command = climb;
             //Wenn Wind -> Felder mit Gefahr markieren
-        } else if (Arrays.asList(stateArray).contains("WIND")) {
+        } else if (arraycontains("WIND")) {
 
             danger(x, y);
             command = decision(x, y);
             //Wenn Gestank -> Felder mit Gefahr markieren
-        } else if (Arrays.asList(stateArray).contains("STENCH")) {
+        } else if (arraycontains("STENCH")) {
 
-            danger(x, y);
-            command = decision(x, y);
+            dange(x, y);
+            command = flee(x, y);
             //Wenn Gold -> Gold aufheben
-        } else if (Arrays.asList(stateArray).contains("GOLD")) {
+        } else if (arraycontains("GOLD")) {
 
             command = pickup;
 
