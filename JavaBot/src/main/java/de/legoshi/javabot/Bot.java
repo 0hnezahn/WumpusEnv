@@ -213,8 +213,8 @@ public class Bot {
     }
 
     public void execute() {
-    	  this.gameArray = gameState.split(";");
-        this.stateString = gameArray[1].replaceAll("\\[", "").replaceAll("\\]", "");
+        this.gameArray = gameState.split(";");
+        this.stateString = gameArray[1].replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s","");
         this.stateArray = stateString.split(",");
 
         if (s0 == 0) {
