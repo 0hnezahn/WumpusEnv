@@ -43,7 +43,6 @@ This means the state of only this one cell is fixed but she is meant to remember
 - walk_left: the player can walk one cell every move
 - walk_right: the player can walk one cell every move
 - pick up: the player can pick up gold if she is on a gold cell
-- put down: if the player has gold she can put it back on the ground
 - climb: the wumpus cave has to be left climbing out the way the player entered
 - scream: a scream can be heard by other players and will be represented as a vector
 - nothing: do nothing for one turn
