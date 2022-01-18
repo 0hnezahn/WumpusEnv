@@ -6,7 +6,7 @@ The environment developed in java will simulate one walkthrough in our partially
 ### 2.1 Evniroment
 + wumpus environment is rectangular
 + Agents: one or more wumpi, two Player
-+ possible observations: nothing, gold, pit, breeze, stench, exit (mby light), locationvector for scream
++ possible observations: nothing, gold, pit, breeze, stench, exit (mby light), locationvector for scream, wall
 
 ### 2.2 States
 + gold: contains one gold
