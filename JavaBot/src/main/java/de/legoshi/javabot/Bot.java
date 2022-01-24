@@ -250,6 +250,14 @@ public class Bot {
         }
 
         visited[width + x][height + y] += 1;
+
+        if (visited[width + x][height + y]>=2 || visited[width + x + 1][height + y]>=2 || visited[width + x - 1][height + y]>=2 || visited[width + x - 1][height + y - 1]>=2 || visited[width + x][height + y + 1]>=2){
+          visited[width + x][height + y]=0;
+          visited[width + x + 1][height + y]=0;
+          visited[width + x - 1][height + y]=0;
+          visited[width + x][height + y + 1]=0;
+          visited[width + x][height + y - 1]=0;
+        }
         //-----------nicht mehr benötigt weil wir ja vom Stench verfolgt werden--------------
         /*
         if ( fleeing <= 3 && fleeing > 0){
