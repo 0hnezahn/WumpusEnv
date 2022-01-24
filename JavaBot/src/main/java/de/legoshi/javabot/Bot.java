@@ -31,8 +31,8 @@ public class Bot {
     public int height;
 
     //Fliehend
-    public String runFromWumpus;
-    public int fleeing = 0;
+    //public String runFromWumpus;
+    //public int fleeing = 0;
 
     //Felder für die Erkennung
     public int[][] visited;
@@ -43,7 +43,7 @@ public class Bot {
     public String down = "B;DOWN;false;false;false";
     public String left = "B;LEFT;false;false;false";
     public String right = "B;RIGHT;false;false;false";
-    public String scream = "B;NOTHING;true;false;false";
+    //public String scream = "B;NOTHING;true;false;false";
     public String pickup = "B;NOTHING;false;true;false";
     public String climb = "B;NOTHING;false;false;true";
 
@@ -70,11 +70,11 @@ public class Bot {
 //Dangerfunktion: Setzt Gefährlichkeitswerte für bestimmte Felder außer diese wurden schon besucht
 
     public boolean arraycontains(String s){
-      for(int i=0; i < stateArray.length; i++){
-        if(stateArray[i].equals(s)){
-          return true;
+        for (String value : stateArray) {
+            if (value.equals(s)) {
+                return true;
+            }
         }
-      }
       return false;
     }
 
