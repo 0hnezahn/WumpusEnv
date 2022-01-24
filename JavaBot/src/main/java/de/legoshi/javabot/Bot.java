@@ -166,16 +166,16 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<2 && safe[width + fx + 1][height + fy]) {
+        if (visited[width + fx + 1][height + fy]==0 && safe[width + fx + 1][height + fy]) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<2 && safe[width + fx - 1][height + fy]) {
+        if (visited[width + fx - 1][height + fy]==0 && safe[width + fx - 1][height + fy]) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<2 && safe[width + fx][height + fy + 1]) {
+        if (visited[width + fx][height + fy + 1]==0 && safe[width + fx][height + fy + 1]) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<2 && safe[width + fx][height + fy - 1]) {
+        if (visited[width + fx][height + fy - 1]==0 && safe[width + fx][height + fy - 1]) {
             d = prob[width + fx][height + fy - 1];
 
             if (arraycontains("WALL_RIGHT")) {
