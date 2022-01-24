@@ -9,9 +9,7 @@ import java.util.Arrays;
  */
 
 /* TODO
-1. Ecken-Problem
-2. Wanderkennung bei flee
-3. Wenn Gold schnell nach Hause, bei beidem Löcher umgehen
+
 */
 
 
@@ -109,17 +107,30 @@ public class Bot {
       int b = 1000; //links
       int c = 1000; //oben
       int d = 1000; //unten
-      if (visited[width + fx + 1][height + fy]>0 && !arraycontains("WALL_RIGHT")) {
-          a = prob[width + fx + 1][height + fy];
+      if (visited[width + fx + 1][height + fy]>0) {
+          a = visited[width + fx + 1][height + fy];
       }
-      if (visited[width + fx - 1][height + fy]>0 && !arraycontains("WALL_LEFT")) {
-          b = prob[width + fx - 1][height + fy];
+      if (visited[width + fx - 1][height + fy]>0) {
+          b = visited[width + fx - 1][height + fy];
       }
-      if (visited[width + fx][height + fy + 1]>0 && !arraycontains("WALL_TOP")) {
-          c = prob[width + fx][height + fy + 1];
+      if (visited[width + fx][height + fy + 1]>0) {
+          c = visited[width + fx][height + fy + 1];
       }
-      if (visited[width + fx][height + fy - 1]>0 && !arraycontains("WALL_BOTTOM")) {
-          d = prob[width + fx][height + fy - 1];
+      if (visited[width + fx][height + fy - 1]>0) {
+          d = visited[width + fx][height + fy - 1];
+      }
+
+      if (arraycontains("WALL_RIGHT")) {
+        a = 1001;
+      }
+      if (arraycontains("WALL_LEFT")) {
+        b = 1001;
+      }
+      if (arraycontains("WALL_TOP")) {
+        c = 1001;
+      }
+      if (arraycontains("WALL_BOTTOM")) {
+        d = 1001;
       }
       int e = getMin(a, b, c, d);
       fileHelper.log("a = " +a);
@@ -155,17 +166,31 @@ public class Bot {
         int b = 1000; //links
         int c = 1000; //oben
         int d = 1000; //unten
-        if (visited[width + fx + 1][height + fy]<2 && safe[width + fx + 1][height + fy] && !arraycontains("WALL_RIGHT")) {
+        if (visited[width + fx + 1][height + fy]<2 && safe[width + fx + 1][height + fy]) {
             a = prob[width + fx + 1][height + fy];
         }
-        if (visited[width + fx - 1][height + fy]<2 && safe[width + fx - 1][height + fy] && !arraycontains("WALL_LEFT")) {
+        if (visited[width + fx - 1][height + fy]<2 && safe[width + fx - 1][height + fy]) {
             b = prob[width + fx - 1][height + fy];
         }
-        if (visited[width + fx][height + fy + 1]<2 && safe[width + fx][height + fy + 1] && !arraycontains("WALL_TOP")) {
+        if (visited[width + fx][height + fy + 1]<2 && safe[width + fx][height + fy + 1]) {
             c = prob[width + fx][height + fy + 1];
         }
-        if (visited[width + fx][height + fy - 1]<2 && safe[width + fx][height + fy - 1] && !arraycontains("WALL_BOTTOM")) {
+        if (visited[width + fx][height + fy - 1]<2 && safe[width + fx][height + fy - 1]) {
             d = prob[width + fx][height + fy - 1];
+
+            if (arraycontains("WALL_RIGHT")) {
+              a = 1001;
+            }
+            if (arraycontains("WALL_LEFT")) {
+              b = 1001;
+            }
+            if (arraycontains("WALL_TOP")) {
+              c = 1001;
+            }
+            if (arraycontains("WALL_BOTTOM")) {
+              d = 1001;
+            }
+
         }
         int e = getMin(a, b, c, d);
         fileHelper.log("a = " +a);
@@ -225,13 +250,16 @@ public class Bot {
         }
 
         visited[width + x][height + y] += 1;
+        //-----------nicht mehr benötigt weil wir ja vom Stench verfolgt werden--------------
+        /*
         if ( fleeing <= 3 && fleeing > 0){
+
           command = runFromWumpus;
           fleeing += 1;
         }
         if ( fleeing > 3 ){
           fleeing = 0;
-        }
+        }*/
         //Wenn Gold und am Eingangs- bzw. Ausgangspunkt -> rausklettern
         if (arraycontains("GOLD") && x == 0 && y == 0){
 
@@ -246,8 +274,11 @@ public class Bot {
 
             danger(x, y);
             command = flee(x, y);
+            //-------------auch nicht mehr benötigt weil wir ja vom Stench verfolgt werden--------
+            /*
             runFromWumpus = command;
             fleeing = 1;
+            */
             //Wenn Gold -> Gold aufheben
         } else if (arraycontains("GOLD")) {
 
