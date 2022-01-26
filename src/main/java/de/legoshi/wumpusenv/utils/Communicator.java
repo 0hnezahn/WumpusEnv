@@ -23,13 +23,13 @@ public class Communicator {
         this.gameState = gameState;
     }
 
-    public void initNewPlayer(Player player) {
+    public void initNewPlayer(Player player, int x, int y) {
         String[] ending = player.getId().split("\\.");
         player.setName(ending[0]);
         File textFile = generateTextFile(player);
         player.setFile(textFile);
 
-        player.setCurrentPosition(new Point2D(0,0));
+        player.setCurrentPosition(new Point2D(x,y));
         while(gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.PLAYER) ||
                 gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.HOLE) ||
                 gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.WUMPUS)) {

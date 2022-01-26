@@ -79,31 +79,38 @@ public class GameState {
             holeNumber = MIN_H_COUNT;
         }
 
-        ThreadLocalRandom.current().ints(0, fieldSize).distinct().limit(goldNumber + holeNumber + playerCount).forEach(arrayListChosen::add);
+        // ThreadLocalRandom.current().ints(0, fieldSize).distinct().limit(goldNumber + holeNumber + playerCount).forEach(arrayListChosen::add);
+        ArrayList<Integer> alreadySelected = new ArrayList<>();
+        arrayListChosen = selectRandomPos(alreadySelected, playerCount, fieldSize);
+        for (int i = 0; i < playerCount; i++) {
+            int playerPos = arrayListChosen.get(i);
+            Player player = players.get(i);
+            if (player.getCustomSpawn() == null || !customSpawn) {
+                alreadySelected.add(playerPos);
+                addPlayer(new Point2D(playerPos % getWidth(), playerPos / getWidth()));
+                player.setCurrentPosition(new Point2D(playerPos % getWidth(), playerPos / getWidth()));
+            } else {
+                alreadySelected.add((int)(player.getCustomSpawn().getX() + player.getCustomSpawn().getY()*getWidth()));
+                addPlayer(player.getCustomSpawn());
+                player.setCurrentPosition(player.getCustomSpawn());
+            }
+        }
 
+        arrayListChosen = selectRandomPos(alreadySelected, goldNumber, fieldSize);
         for (int i = 0; i < goldNumber; i++) {
             int goldPos = arrayListChosen.get(i);
             addGold(goldPos / getWidth(), goldPos % getWidth());
             Point2D wPos = new Point2D(goldPos % getWidth(), goldPos / getWidth());
             wumpuses.add(new Wumpus(wPos));
+            alreadySelected.add(goldPos);
         }
 
+        arrayListChosen = selectRandomPos(alreadySelected, holeNumber, fieldSize);
         for (int i = 0; i < holeNumber; i++) {
-            int holePos = arrayListChosen.get(goldNumber + i);
+            int holePos = arrayListChosen.get(i);
             addHole(holePos / getWidth(), holePos % getWidth());
         }
 
-        for (int i = 0; i < playerCount; i++) {
-            int playerPos = arrayListChosen.get(goldNumber + holeNumber + i);
-            Player player = players.get(i);
-            if (player.getCustomSpawn() == null || !customSpawn) {
-                addPlayer(new Point2D(playerPos % getWidth(), playerPos / getWidth()));
-                player.setCurrentPosition(new Point2D(playerPos % getWidth(), playerPos / getWidth()));
-            } else {
-                addPlayer(player.getCustomSpawn());
-                player.setCurrentPosition(player.getCustomSpawn());
-            }
-        }
     }
 
     /**
@@ -249,6 +256,32 @@ public class GameState {
      */
     public int getHeight() {
         return this.game.length;
+    }
+
+    private ArrayList<Integer> selectRandomPos(ArrayList<Integer> integers, int size, int amount) {
+        ArrayList<Integer> arrayListChosen = new ArrayList<>();
+        if(size == 0) return arrayListChosen;
+
+        ThreadLocalRandom.current().ints(0, amount).distinct().limit(size).forEach(arrayListChosen::add);
+
+        System.out.println(arrayListChosen);
+        System.out.println(integers);
+        int i = 0;
+
+        while (true) {
+            if(checkValueIn(integers, arrayListChosen) || i == 10) {
+                arrayListChosen = new ArrayList<>();
+                ThreadLocalRandom.current().ints(0, amount).distinct().limit(size).forEach(arrayListChosen::add);
+            } else return arrayListChosen;
+            i++;
+        }
+    }
+
+    private boolean checkValueIn(ArrayList<Integer> val1, ArrayList<Integer> val2) {
+        for(Integer i : val1) {
+            if(val2.contains(i)) return true;
+        }
+        return false;
     }
 
 }

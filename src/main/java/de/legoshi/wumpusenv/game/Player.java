@@ -49,7 +49,7 @@ public class Player extends Entity {
         if(playerVision.getScream() == null) this.playerVision.setScream(new Point2D(0,0));
 
         String s = "C;";
-        s = s + listToString(playerVision.getSelf()) + ";";
+        s = s + listToString(playerVision.getSelf()).replace(" ", "") + ";";
         s = s + "[" + playerVision.getScream().getX() + "," + playerVision.getScream().getY() + "]" + ";";
         s = s + hasGold + ";";
         s = s + hasEscaped + ";";

@@ -58,7 +58,6 @@ public class Simulator {
                             all.setHasEscaped(true);
                             Platform.runLater(() -> messageLabel.setText(all.getId() + " has escaped"));
                             FileHelper.writeToLog(all.getId() + " has escaped");
-
                         }
                     } else if (all.isPickup()) {
                         if (fieldStatus.contains(Status.GOLD)) {
@@ -67,9 +66,8 @@ public class Simulator {
                             Platform.runLater(() ->messageLabel.setText(all.getId() + " has collected the gold"));
                             FileHelper.writeToLog(all.getId() + " has collected the gold");
                         }
-                    } else {
-                        all.setOldPosition(all.getCurrentPosition());
                     }
+                    all.setOldPosition(playerPos);
                 }
                 validatePlayerPos(all);
                 syncPlayer(all);
@@ -142,7 +140,7 @@ public class Simulator {
         }
 
         fieldStatusOld.remove(Status.PLAYER);
-        fieldStatus.remove(Status.PLAYER);
+        // fieldStatus.remove(Status.PLAYER);
         fieldStatus.add(Status.PLAYER);
     }
 

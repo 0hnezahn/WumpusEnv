@@ -24,7 +24,7 @@ public class FieldStatus {
 
     public void addStatus(Status status) {
         if(arrayList.contains(Status.HOLE)) return;
-        if(arrayList.contains(status)) return;
+        if(arrayList.contains(status) && !status.equals(Status.PLAYER) && !status.equals(Status.START)) return;
 
         if(status.equals(Status.HOLE))  arrayList.clear();
         arrayList.add(status);

@@ -18,6 +18,7 @@ import javafx.scene.layout.*;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -200,7 +201,11 @@ public class Controller implements Initializable {
                     simulator.receiveInstructions();
                     simulator.simulateStep();
                     for (Player all : gameState.getPlayers()) {
-                        all.setPlayerVision(simulator.getSelf(all.getCurrentPosition()));
+                        if(all.getPlayerVision() == null) {
+                            all.setPlayerVision(simulator.getSelf(all.getCurrentPosition()));
+                        } else {
+                            all.getPlayerVision().setSelf(simulator.getSelf(all.getCurrentPosition()).getSelf());
+                        }
                         simulator.setVisible(all.getPlayerVision(), true);
                     }
                     simulator.sendPlayerStates();
@@ -257,14 +262,30 @@ public class Controller implements Initializable {
             }
         }
 
-        communicator.initNewPlayer(player);
+        int x = 0;
+        int y = 0;
+        boolean done = false;
+        for(int i = 0; i < gameState.getHeight(); i++) {
+            for(int j = 0; j < gameState.getWidth(); j++) {
+                if(!gameState.getGame()[j][i].getArrayList().contains(Status.PLAYER)) {
+                    x = i;
+                    y = j;
+                    done = true;
+                    break;
+                }
+            }
+            if(done) break;
+        }
+
+        communicator.initNewPlayer(player, x, y);
 
         gameState.getPlayers().add(player);
         removeBotCB.getItems().add(bName);
 
         player.setPlayerVision(simulator.getSelf(player.getCurrentPosition()));
         simulator.setVisible(player.getPlayerVision(), true);
-        gameState.addPlayer(new Point2D(0, 0));
+
+        gameState.addPlayer(new Point2D(x, y));
 
         removeBot.setDisable(false);
         removeBotCB.setDisable(false);
