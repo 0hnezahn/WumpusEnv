@@ -16,20 +16,19 @@ public class BotTesting {
 
     public String command = nothing;
 
-    private int i = -1;
+    private int i = 1;
 
     public BotTesting(FileHelper fileHelper) {
         this.fileHelper = fileHelper;
     }
 
-
     public void execute() {
         // bot1Behaviour(i);
-        bot2Behaviour(i);
+        // bot2Behaviour(i);
+        command = scream;
         fileHelper.log("test log");
         i++;
     }
-
 
     private void bot1Behaviour(int i) {
         switch (i) {

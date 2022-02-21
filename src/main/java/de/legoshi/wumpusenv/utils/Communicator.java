@@ -17,7 +17,8 @@ import java.util.Scanner;
 public class Communicator {
 
     private GameState gameState;
-    @Setter private Label messageLabel;
+    @Setter
+    private Label messageLabel;
 
     public Communicator(GameState gameState) {
         this.gameState = gameState;
@@ -29,18 +30,45 @@ public class Communicator {
         File textFile = generateTextFile(player);
         player.setFile(textFile);
 
-        player.setCurrentPosition(new Point2D(x,y));
-        while(gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.PLAYER) ||
+        player.setCurrentPosition(new Point2D(x, y));
+        while (gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.PLAYER) ||
                 gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.HOLE) ||
                 gameState.getGame()[(int) player.getCurrentPosition().getY()][(int) player.getCurrentPosition().getX()].getArrayList().contains(Status.WUMPUS)) {
-            player.setCurrentPosition(new Point2D(Math.random()* gameState.getWidth(),Math.random()*gameState.getHeight()));
+            player.setCurrentPosition(new Point2D(Math.random() * gameState.getWidth(), Math.random() * gameState.getHeight()));
         }
 
         try {
             Runtime re = Runtime.getRuntime();
             if (ending[1].equals("jar")) {
+                System.out.println("ID: " + player.getId() + "    FILE: " + player.getName() + ".txt");
                 Process process = re.exec("java -jar " + player.getId() + " " + player.getName() + ".txt");
                 player.setProcess(process);
+
+                BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+                // Read the output from the command
+                new Thread(() -> {
+                    String s;
+                    System.out.println("Here is the standard output of the command:\n");
+                    try {
+                        while ((s = stdInput.readLine()) != null) System.out.println(s);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+
+                // Read any errors from the attempted command
+                new Thread(() -> {
+                    String s;
+                    System.out.println("Here is the standard error of the command (if any):\n");
+                    try {
+                        while ((s = stdError.readLine()) != null) System.out.println(s);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+
             } else if (ending[1].equals("py")) {
                 Process process = re.exec("python " + player.getId() + " " + player.getName() + ".txt");
                 player.setProcess(process);

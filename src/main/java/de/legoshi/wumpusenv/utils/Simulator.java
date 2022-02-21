@@ -66,6 +66,12 @@ public class Simulator {
                             Platform.runLater(() ->messageLabel.setText(all.getId() + " has collected the gold"));
                             FileHelper.writeToLog(all.getId() + " has collected the gold");
                         }
+                    } else if (!all.getInfo().equals("")) {
+                        for (Player receivers : gameState.getPlayers()) {
+                            if (!receivers.equals(all)) {
+                                receiveInform(receivers, all.getInfo());
+                            }
+                        }
                     }
                     all.setOldPosition(playerPos);
                 }
@@ -150,6 +156,10 @@ public class Simulator {
 
         Point2D screamVector = new Point2D(xDirection, yDirection);
         receiver.getPlayerVision().setScream(screamVector);
+    }
+
+    public void receiveInform(Player receiver, String info) {
+        receiver.setInfo(info);
     }
 
     public void wumpusMove() {

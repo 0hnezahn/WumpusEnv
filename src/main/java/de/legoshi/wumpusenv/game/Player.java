@@ -27,6 +27,8 @@ public class Player extends Entity {
     private boolean climb;
     private boolean alive;
 
+    private String info;
+
     private boolean hasGold;
     private boolean hasEscaped;
 
@@ -37,6 +39,8 @@ public class Player extends Entity {
         this.scream = false;
         this.pickup = false;
         this.climb = false;
+
+        this.info = "";
 
         this.customSpawn = customSpawn;
 
@@ -50,6 +54,8 @@ public class Player extends Entity {
 
         String s = "C;";
         s = s + listToString(playerVision.getSelf()).replace(" ", "") + ";";
+        s = s + "[" + (int)this.getCurrentPosition().getX() + "," + (int)this.getCurrentPosition().getY() + "];";
+        s = s + "[" + info + "];";
         s = s + "[" + playerVision.getScream().getX() + "," + playerVision.getScream().getY() + "]" + ";";
         s = s + hasGold + ";";
         s = s + hasEscaped + ";";
@@ -69,6 +75,7 @@ public class Player extends Entity {
         this.scream = args[2].equals("true");
         this.pickup = args[3].equals("true");
         this.climb = args[4].equals("true");
+        this.info = args[5];
     }
 
     public void resetInstructions() {
@@ -76,6 +83,7 @@ public class Player extends Entity {
         this.scream = false;
         this.pickup = false;
         this.climb = false;
+        this.info = "";
     }
 
 }

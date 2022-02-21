@@ -24,6 +24,7 @@ public class FileHelper {
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
+            log("Couldnt open Filewriter");
             System.out.println("Couldnt open Filewriter");
         }
     }

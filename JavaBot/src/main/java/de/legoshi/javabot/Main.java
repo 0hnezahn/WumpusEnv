@@ -14,8 +14,8 @@ public class Main {
         File file = new File("./"+args[0]);
         File logFile = new File("./log-"+args[0]);
 
-        // File file = new File("./javabot.jar.txt");
-        // File logFile = new File("./log-javabot.jar.txt");
+        // File file = new File("./yazarbot.txt");
+        // File logFile = new File("./log-yazarbot.txt");
 
         FileHelper fileHelper = new FileHelper(file, logFile);
 
@@ -36,6 +36,7 @@ public class Main {
                         fileHelper.writeToFile(readyMessage);
                         bot.width = Integer.parseInt(message[2]);
                         bot.height = Integer.parseInt(message[3]);
+                        continue;
                     }
                 }
                 if(message[0].equals("C")) {
